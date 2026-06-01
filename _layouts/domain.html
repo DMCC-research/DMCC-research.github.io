@@ -1,0 +1,23 @@
+---
+layout: default
+---
+{% assign domain = site.data.domains | where: "id", page.research_domain | first %}
+<section class="domain-page">
+  <p class="eyebrow">{{ page.research_domain }}</p>
+  <h1>{{ page.title | default: domain.title | escape }}</h1>
+  {{ content }}
+  <h2>Posts</h2>
+  {% assign posts = site.posts | where: "research_domain", page.research_domain %}
+  {% if posts.size > 0 %}
+    <ul class="post-list">
+      {% for post in posts %}
+        <li>
+          <a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>
+          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No public posts yet.</p>
+  {% endif %}
+</section>

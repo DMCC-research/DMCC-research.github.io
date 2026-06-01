@@ -1,0 +1,16 @@
+- id: D1
+  slug: memory-centric-agent-systems
+  title: Memory-Centric Systems for Long-Horizon Agents
+  path: /domains/d1/
+- id: D2
+  slug: distributed-ai-architecture-modeling
+  title: Distributed AI Architecture and Modeling
+  path: /domains/d2/
+- id: D3
+  slug: efficient-ai-deployment-runtime
+  title: Efficient AI Deployment Runtime
+  path: /domains/d3/
+- id: DMCC
+  slug: data-movement-centric-computing
+  title: Data Movement-Centric Computing
+  path: /domains/dmcc/
