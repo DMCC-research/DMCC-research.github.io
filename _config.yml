@@ -3,6 +3,7 @@ description: Research notes on data movement in modern AI deployment.
 theme: minima
 permalink: /:year/:month/:day/:title/
 timezone: America/Vancouver
+future: true
 
 markdown: kramdown
 kramdown:
