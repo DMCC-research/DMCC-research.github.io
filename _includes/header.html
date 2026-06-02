@@ -7,7 +7,7 @@
   {% assign posts_label = "文章" %}
   {% assign domains_label = "领域" %}
   {% assign about_label = "关于" %}
-  {% assign switch_label = "EN" %}
+  {% assign switch_label = "En" %}
   {% assign switch_title = "Switch to English" %}
   {% assign fallback_switch_url = "/" %}
 {% else %}
@@ -18,7 +18,7 @@
   {% assign posts_label = "Posts" %}
   {% assign domains_label = "Domains" %}
   {% assign about_label = "About" %}
-  {% assign switch_label = "中文" %}
+  {% assign switch_label = "中" %}
   {% assign switch_title = "切换到中文" %}
   {% assign fallback_switch_url = "/zh/" %}
 {% endif %}
@@ -39,9 +39,6 @@
     <a href="{{ home_url | relative_url }}">{{ posts_label }}</a>
     <a href="{{ domains_url | relative_url }}">{{ domains_label }}</a>
     <a href="{{ about_url | relative_url }}">{{ about_label }}</a>
-    <a class="language-switch site-language-switch" href="{{ switch_url | relative_url }}" title="{{ switch_title }}" aria-label="{{ switch_title }}">
-      <span class="language-switch-icon" aria-hidden="true">文/A</span>
-      <span class="language-switch-label">{{ switch_label }}</span>
-    </a>
+    <a href="{{ switch_url | relative_url }}" title="{{ switch_title }}" aria-label="{{ switch_title }}">{{ switch_label }}</a>
   </nav>
 </header>
