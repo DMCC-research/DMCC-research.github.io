@@ -1,13 +1,19 @@
 ---
 layout: default
 ---
+{% assign current_lang = page.lang | default: "en" %}
 {% assign domain = site.data.domains | where: "id", page.research_domain | first %}
 <section class="domain-page">
   <p class="eyebrow">{{ page.research_domain }}</p>
-  <h1>{{ page.title | default: domain.title | escape }}</h1>
+  {% if current_lang == "zh" %}
+    <h1>{{ page.title | default: domain.title_zh | escape }}</h1>
+  {% else %}
+    <h1>{{ page.title | default: domain.title | escape }}</h1>
+  {% endif %}
   {{ content }}
-  <h2>Posts</h2>
-  {% assign posts = site.posts | where: "research_domain", page.research_domain %}
+  <h2>{% if current_lang == "zh" %}文章{% else %}Posts{% endif %}</h2>
+  {% assign domain_posts = site.posts | where: "research_domain", page.research_domain %}
+  {% assign posts = domain_posts | where: "lang", current_lang %}
   {% if posts.size > 0 %}
     <ul class="post-list">
       {% for post in posts %}
@@ -18,6 +24,6 @@ layout: default
       {% endfor %}
     </ul>
   {% else %}
-    <p>No public posts yet.</p>
+    <p>{% if current_lang == "zh" %}暂无公开文章。{% else %}No public posts yet.{% endif %}</p>
   {% endif %}
 </section>

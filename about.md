@@ -2,6 +2,8 @@
 layout: default
 title: About
 permalink: /about/
+lang: en
+translation_url: /zh/about/
 ---
 
 # About

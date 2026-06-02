@@ -2,6 +2,8 @@
 layout: default
 title: Domains
 permalink: /domains/
+lang: en
+translation_url: /zh/domains/
 ---
 
 # Research Domains

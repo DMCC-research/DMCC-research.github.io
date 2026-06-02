@@ -1,8 +1,47 @@
+{% assign current_lang = page.lang | default: "en" %}
+{% if current_lang == "zh" %}
+  {% assign home_url = "/zh/" %}
+  {% assign domains_url = "/zh/domains/" %}
+  {% assign about_url = "/zh/about/" %}
+  {% assign site_label = "AI 系统研究笔记" %}
+  {% assign posts_label = "文章" %}
+  {% assign domains_label = "领域" %}
+  {% assign about_label = "关于" %}
+  {% assign switch_label = "EN" %}
+  {% assign switch_title = "Switch to English" %}
+  {% assign fallback_switch_url = "/" %}
+{% else %}
+  {% assign home_url = "/" %}
+  {% assign domains_url = "/domains/" %}
+  {% assign about_url = "/about/" %}
+  {% assign site_label = site.title %}
+  {% assign posts_label = "Posts" %}
+  {% assign domains_label = "Domains" %}
+  {% assign about_label = "About" %}
+  {% assign switch_label = "中文" %}
+  {% assign switch_title = "切换到中文" %}
+  {% assign fallback_switch_url = "/zh/" %}
+{% endif %}
+
+{% assign switch_url = page.translation_url | default: fallback_switch_url %}
+{% if page.translation_key %}
+  {% assign translations = site.posts | where: "translation_key", page.translation_key %}
+  {% for translation in translations %}
+    {% if translation.url != page.url %}
+      {% assign switch_url = translation.url %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
 <header class="site-header">
-  <a class="site-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+  <a class="site-title" href="{{ home_url | relative_url }}">{{ site_label }}</a>
   <nav class="site-nav" aria-label="Primary">
-    <a href="{{ '/' | relative_url }}">Posts</a>
-    <a href="{{ '/domains/' | relative_url }}">Domains</a>
-    <a href="{{ '/about/' | relative_url }}">About</a>
+    <a href="{{ home_url | relative_url }}">{{ posts_label }}</a>
+    <a href="{{ domains_url | relative_url }}">{{ domains_label }}</a>
+    <a href="{{ about_url | relative_url }}">{{ about_label }}</a>
+    <a class="language-switch site-language-switch" href="{{ switch_url | relative_url }}" title="{{ switch_title }}" aria-label="{{ switch_title }}">
+      <span class="language-switch-icon" aria-hidden="true">文/A</span>
+      <span class="language-switch-label">{{ switch_label }}</span>
+    </a>
   </nav>
 </header>

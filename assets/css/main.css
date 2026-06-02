@@ -107,30 +107,10 @@ h2 {
 }
 
 .post-list time,
-.post-list-meta,
 .post-meta,
 .eyebrow {
   color: var(--muted);
   font-size: 14px;
-}
-
-.post-list-meta {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  white-space: nowrap;
-}
-
-.lang-badge {
-  display: inline-grid;
-  min-width: 34px;
-  height: 24px;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  color: var(--accent-dark);
-  font-size: 12px;
-  font-weight: 700;
 }
 
 .post-meta {
@@ -143,13 +123,6 @@ h2 {
 .post-header {
   padding-bottom: 24px;
   border-bottom: 1px solid var(--line);
-}
-
-.post-title-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 16px;
-  align-items: start;
 }
 
 .language-switch {
@@ -171,6 +144,10 @@ h2 {
 .language-switch-icon {
   color: var(--accent);
   font-size: 13px;
+}
+
+.site-language-switch {
+  height: 32px;
 }
 
 .post-body {
@@ -215,10 +192,6 @@ h2 {
 
   .page-content {
     padding-top: 32px;
-  }
-
-  .post-title-row {
-    grid-template-columns: 1fr;
   }
 
   .language-switch {
