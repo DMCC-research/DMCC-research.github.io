@@ -3,6 +3,8 @@ layout: post
 title: Where Agent State Lives
 date: 2026-06-01
 research_domain: D1
+lang: en
+translation_key: one-year-d1-agent-state
 tags:
 - agent-memory
 - kv-cache
@@ -14,15 +16,15 @@ start_date: '2025-06-01'
 end_date: '2026-06-01'
 ---
 
-Over the last year, my systems research direction has converged on a simple question: **where does agent state live?**
+Over the last year, long-horizon agent systems have converged on a simple systems question: **where does agent state live?**
 
-This sounds like a software question, but it is also an architecture question. Long-horizon agents repeatedly carry state across turns, tools, users, memory stores, inference servers, schedulers, accelerators, and storage tiers. Every time that state moves, the system pays in latency, bandwidth, energy, isolation risk, or scheduler complexity. My working frame is Data Movement-Centric Computing: instead of starting from model size or FLOPs, start from the movement of state.
+This sounds like a software question, but it is also an architecture question. Long-horizon agents repeatedly carry state across turns, tools, users, memory stores, inference servers, schedulers, accelerators, and storage tiers. Every time that state moves, the system pays in latency, bandwidth, energy, isolation risk, or scheduler complexity. A practical starting point is therefore not only model size or FLOPs, but the movement of state.
 
 For modern AI deployment, this reframes several familiar bottlenecks. Context is not just tokens. KV cache is not just an optimization. Agent memory is not just retrieval. Serving is not just batching. These are all mechanisms for deciding what state is materialized, where it resides, when it moves, and whether movement can be avoided.
 
-This post is a one-year overview of that direction, written for systems and architecture researchers. I separate source claims from my interpretation, and I focus on mechanisms rather than product narratives.
+This post is a one-year overview of that direction, written for systems and architecture researchers. It separates source claims from interpretation and focuses on mechanisms rather than product narratives.
 
-## The Research Frame
+## The Public Research Frame
 
 The core questions stayed stable through the year:
 
@@ -30,13 +32,13 @@ The core questions stayed stable through the year:
 2. **When should agent state move?**
 3. **Which movement can be avoided through locality, caching, summarization, compression, or near-data execution?**
 
-My active anchors remain CENT, DREAM, ADAPT, Farm, GenDP, DX100, and GenomicsBench. Across them, the recurring pattern is not “make AI faster” in the abstract. It is to track which data dominates execution, which part of the stack controls that data, and which interface exposes or hides the movement.
+Across the period, the recurring pattern is not “make AI faster” in the abstract. It is to track which data dominates execution, which part of the stack controls that data, and which interface exposes or hides the movement.
 
 By mid-2026, the public literature around agent systems had moved in the same direction. The most useful papers are not simply proposing bigger contexts or better memory modules. They are making state placement explicit.
 
 For example, agent memory papers now ask whether long-term memory should be treated as a database with governed state operators, trajectory correctness, and explicit memory evolution, as in [Is Agent Memory a Database?](https://arxiv.org/abs/2605.26252). Other work treats execution traces themselves as first-class state, with fork, replay, and counterfactual inspection mechanisms, as in [Shepherd](https://arxiv.org/abs/2605.10913). Serving papers increasingly treat KV cache as a shared, movable, compressible, security-sensitive object rather than an internal implementation detail, visible in work such as [KVServe](https://arxiv.org/abs/2605.13734), [ObjectCache](https://arxiv.org/abs/2605.22850), and [Resident KV Claims](https://arxiv.org/abs/2605.24259).
 
-My interpretation is that long-horizon agents are forcing a split between **semantic memory** and **execution-resident state**. The former is about what the agent knows. The latter is about what the runtime has already paid to materialize. Systems research has often treated these separately. Agent workloads make that separation expensive.
+A useful interpretation is that long-horizon agents are forcing a split between **semantic memory** and **execution-resident state**. The former is about what the agent knows. The latter is about what the runtime has already paid to materialize. Systems research has often treated these separately. Agent workloads make that separation expensive.
 
 ## Mechanism 1: Agent Memory Becomes a State System
 
@@ -46,7 +48,7 @@ Several papers in the period argue that memory should not only be a bag of embed
 
 The source claim across these papers is clear: long-horizon agents need memory systems that manage writes, updates, consolidation, retrieval, and provenance under bounded latency and cost.
 
-My interpretation is more skeptical: many “agent memory” designs still under-specify the write path. Retrieval benchmarks can make memory look useful even when the system has not solved update locality, conflict resolution, deletion, or provenance. For deployed agents, the hard question is not only “can the model recall this fact?” It is “who wrote this state, when, from which trajectory, under which authority, and what later computation depends on it?”
+A more skeptical interpretation is that many “agent memory” designs still under-specify the write path. Retrieval benchmarks can make memory look useful even when the system has not solved update locality, conflict resolution, deletion, or provenance. For deployed agents, the hard question is not only “can the model recall this fact?” It is “who wrote this state, when, from which trajectory, under which authority, and what later computation depends on it?”
 
 That is why security and governance papers matter. [MemLineage](https://arxiv.org/abs/2605.14421) introduces lineage-guided enforcement for agent memory, using chain-of-custody ideas for sensitive actions. [MRMMIA](https://arxiv.org/abs/2605.27825) studies membership inference attacks on memory in chat agents. [Hijacking Agent Memory](https://arxiv.org/abs/2605.29960) examines memory poisoning through conversational interaction. These are not side issues. They expose the fact that persistent state creates a new attack surface.
 
@@ -64,7 +66,7 @@ The source claim is that agentic workloads have repeated state movement that con
 
 The design tension is that shared KV state is both valuable and dangerous. [CacheProbe](https://arxiv.org/abs/2605.30613) audits prompt cache isolation in gateway APIs and raises questions about cross-user cache sharing, metadata disclosure, and provider isolation. [Continuous Discovery of Vulnerabilities in LLM Serving Systems with Fuzzing](https://arxiv.org/abs/2605.11202) studies serving-layer failures involving concurrency and shared state. [Bit-Flip Vulnerability of Shared KV-Cache Blocks](https://arxiv.org/abs/2604.17249) points to integrity risks when cache blocks are shared.
 
-My interpretation is that KV cache is becoming the equivalent of a memory page in an operating system: it needs allocation, ownership, permission, migration, eviction, integrity, and accounting. A serving system that treats KV as opaque tensor scratch space will struggle with agent workloads.
+A useful interpretation is that KV cache is becoming the equivalent of a memory page in an operating system: it needs allocation, ownership, permission, migration, eviction, integrity, and accounting. A serving system that treats KV as opaque tensor scratch space will struggle with agent workloads.
 
 ## Mechanism 3: The Bottleneck Moves from Compute to Movement
 
@@ -88,7 +90,7 @@ The shared claim is that scheduling without memory awareness leaves performance 
 
 Disaggregation makes this more explicit. [How Far Can Disaggregation Go?](https://arxiv.org/abs/2605.28302) explores attention-FFN disaggregation for MoE serving. [Frontier](https://arxiv.org/abs/2605.21312) models disaggregated serving with scheduler-batch-engine loops and communication-memory costs. [RTP-LLM](https://arxiv.org/abs/2605.29639) reports production-oriented mechanisms including model loading order, I/O-communication overlap, hierarchical KV reuse, and adaptive KV quantization.
 
-My judgment is that the scheduler should expose a state movement budget, not just a token budget. Time-to-first-token and time-per-output-token are useful metrics, but they hide the reason for delay. For agent workloads, we need to know whether the request waited for compute, KV materialization, remote retrieval, compression, migration, or cache admission.
+A practical judgment is that the scheduler should expose a state movement budget, not just a token budget. Time-to-first-token and time-per-output-token are useful metrics, but they hide the reason for delay. For agent workloads, we need to know whether the request waited for compute, KV materialization, remote retrieval, compression, migration, or cache admission.
 
 ## Mechanism 5: Memory Hierarchies Reappear
 
@@ -102,7 +104,7 @@ The source claims are architecture-specific, and many require careful validation
 
 ## Design Questions Still Open
 
-I see five unresolved questions.
+Five unresolved questions remain.
 
 First, **what is the unit of agent state?** It could be a token span, KV block, memory record, tool trace, execution branch, semantic fact, or database transaction. Different papers choose different units. The right answer may vary by layer, but the interfaces between units remain underdefined.
 
@@ -126,4 +128,4 @@ The architecture opportunity is to make memory hierarchy and near-data execution
 
 The research risk is that the field treats every mechanism as a separate optimization: one paper for prefix caching, one for KV compression, one for memory poisoning, one for agent benchmarks, one for disaggregation. Long-horizon agents will not experience these as separate mechanisms. They will experience them as one state lifecycle.
 
-My one-year takeaway is therefore simple: **agent systems are becoming state systems, and state systems are data movement systems.** The useful research will be the work that makes that movement explicit, measurable, and controllable.
+The one-year takeaway is therefore simple: **agent systems are becoming state systems, and state systems are data movement systems.** The useful research will be the work that makes that movement explicit, measurable, and controllable.

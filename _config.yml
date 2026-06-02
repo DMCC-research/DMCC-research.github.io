@@ -1,5 +1,6 @@
-title: Data Movement-Centric Computing
-description: Research notes on data movement in modern AI deployment.
+title: AI Systems Research Notes
+description: Public research notes on memory, state, architecture, and deployment systems.
+lang: en
 theme: minima
 permalink: /:year/:month/:day/:title/
 timezone: America/Vancouver

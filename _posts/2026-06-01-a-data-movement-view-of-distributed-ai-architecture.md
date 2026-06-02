@@ -3,6 +3,8 @@ layout: post
 title: A Data Movement View of Distributed AI Architecture
 date: 2026-06-01
 research_domain: D2
+lang: en
+translation_key: one-year-d2-distributed-ai-architecture
 tags:
 - distributed-ai
 - architecture
@@ -17,11 +19,11 @@ start_date: '2025-06-01'
 end_date: '2026-06-01'
 ---
 
-Over the last year, my reading of distributed AI systems has become less centered on "more compute" and more centered on a simpler question: where is the state, when does it move, and which movement path dominates?
+Over the last year, distributed AI architecture work has become less centered on "more compute" and more centered on a simpler question: where is the state, when does it move, and which movement path dominates?
 
-That framing is the core of Data Movement-Centric Computing for modern AI deployment. It is not a claim that arithmetic no longer matters. It is a claim that many deployment bottlenecks now appear first as movement bottlenecks: KV cache movement, weight movement, expert movement, CXL or RDMA traffic, host-device synchronization, storage reads, collective communication, and memory-tier promotion. The useful architectural question is not whether a system is "GPU-bound" or "memory-bound" in the abstract, but which tier and which transfer path sets the floor.
+This is not a claim that arithmetic no longer matters. It is a claim that many deployment bottlenecks now appear first as movement bottlenecks: KV cache movement, weight movement, expert movement, CXL or RDMA traffic, host-device synchronization, storage reads, collective communication, and memory-tier promotion. The useful architectural question is not whether a system is "GPU-bound" or "memory-bound" in the abstract, but which tier and which transfer path sets the floor.
 
-This year, the literature around distributed AI architecture moved in that direction. The work I tracked spans LLM serving, long-context memory systems, CXL memory pooling, near-data computing, PIM, heterogeneous collectives, edge inference, and performance modeling. The common pattern is that systems papers are becoming more explicit about state placement and movement contracts.
+This year, the literature around distributed AI architecture moved in that direction. The tracked work spans LLM serving, long-context memory systems, CXL memory pooling, near-data computing, PIM, heterogeneous collectives, edge inference, and performance modeling. The common pattern is that systems papers are becoming more explicit about state placement and movement contracts.
 
 ## 1. KV Cache Became a Distributed Memory Problem
 
@@ -31,7 +33,7 @@ The clearest shift was around KV cache. Early serving systems treated KV mostly 
 
 By 2026, the question sharpened from "can we fit the cache?" to "what contract does the runtime expose for cache reuse?" [Resident KV Claims](https://arxiv.org/abs/2605.24259) is important in that sense because it treats future KV reuse as a conformance problem under active KV pressure. [CacheProbe](https://arxiv.org/abs/2605.30613) adds a different constraint: once cache reuse crosses user or provider boundaries, isolation and metadata leakage become architectural concerns, not just API concerns.
 
-My interpretation: KV cache has become the new distributed memory substrate for inference. The unresolved question is whether it should be managed as an allocator artifact, a scheduler-visible resource, a networked cache, or an application-level semantic object. Most systems still mix these layers.
+A useful interpretation: KV cache has become the new distributed memory substrate for inference. The unresolved question is whether it should be managed as an allocator artifact, a scheduler-visible resource, a networked cache, or an application-level semantic object. Most systems still mix these layers.
 
 ## 2. Memory Tiering Moved from Capacity Relief to Policy Design
 
@@ -51,9 +53,9 @@ The strongest through-line is not "compute near memory is always better." It is 
 
 [DCC](https://arxiv.org/abs/2511.15503) treated PIM as a compilation and data-layout problem, not merely a device primitive. [PIM or CXL-PIM?](https://arxiv.org/abs/2511.14400) compared architectural trade-offs around unified address spaces, staging, coherence, and link latency. [PIM-SHERPA](https://arxiv.org/abs/2603.09216) focused on software methods for resolving memory attribute and layout mismatches on PIM systems. [AQPIM](https://arxiv.org/abs/2604.18137), [RACAM](https://arxiv.org/abs/2512.09304), [Sangam](https://arxiv.org/abs/2511.12286), and [flash-PIM for token generation](https://arxiv.org/abs/2511.12860) all explore variants of moving LLM-related computation closer to memory.
 
-Outside LLMs, [Co-designing graph-based ANNS for PIM](https://arxiv.org/abs/2605.25522), [FaTRQ](https://arxiv.org/abs/2601.09985), [ATLAS](https://arxiv.org/abs/2605.09402), and [Parallel R-tree spatial query processing on UPMEM](https://arxiv.org/abs/2604.14445) show why irregular memory access remains a good test case for near-data computing. [GenDRAM](https://arxiv.org/abs/2602.23828) is also relevant to my GenDP and GenomicsBench anchors because it pushes the discussion toward end-to-end workflow placement rather than isolated kernel speedup.
+Outside LLMs, [Co-designing graph-based ANNS for PIM](https://arxiv.org/abs/2605.25522), [FaTRQ](https://arxiv.org/abs/2601.09985), [ATLAS](https://arxiv.org/abs/2605.09402), and [Parallel R-tree spatial query processing on UPMEM](https://arxiv.org/abs/2604.14445) show why irregular memory access remains a good test case for near-data computing. [GenDRAM](https://arxiv.org/abs/2602.23828) is also relevant because it pushes the discussion toward end-to-end workflow placement rather than isolated kernel speedup.
 
-My judgment is skeptical but constructive: near-data computing is strongest when it comes with a compiler, layout, or scheduling story. Device-level speedups are not enough. If the host-device path, data marshaling, or peripheral coordination dominates, the architecture has only moved the bottleneck.
+A practical judgment is skeptical but constructive: near-data computing is strongest when it comes with a compiler, layout, or scheduling story. Device-level speedups are not enough. If the host-device path, data marshaling, or peripheral coordination dominates, the architecture has only moved the bottleneck.
 
 ## 4. Interconnects and Collectives Became Workload-Specific
 
@@ -73,7 +75,7 @@ A useful development this year was a move away from single-number performance cl
 
 Inference measurement also became more concrete. [Memory-Bound but Not Bandwidth-Limited](https://arxiv.org/abs/2605.30571) is a useful title because it captures a subtle point: a workload can be memory-bound without saturating theoretical bandwidth, due to runtime overheads, CUDA Graph effects, KV traffic, and quantization realization gaps. [When NPUs Are Not Always Faster](https://arxiv.org/abs/2605.27435) made a similar stage-level argument for mobile LLM inference. [Understanding Inference Scaling for LLMs](https://arxiv.org/abs/2605.19775) connected reasoning workloads, KV fragmentation, capacity-bound decode, and parallelism trade-offs.
 
-This is close to the architecture modeling direction I care about: a model is useful when it predicts the bottleneck transition, not just the peak.
+This points to a mechanism-aware architecture modeling direction: a model is useful when it predicts the bottleneck transition, not just the peak.
 
 ## 6. State Correctness Is Becoming a Systems Topic
 
@@ -95,6 +97,6 @@ Second, when should movement be avoided versus made cheaper? Compression systems
 
 Third, how do we benchmark bottleneck shifts? Kernel-level improvement is not enough if end-to-end execution is dominated by staging, synchronization, metadata, paging, or power provisioning. Papers such as [Provisioning to Runtime Optimization of a 100 MW-Scale AI Cluster](https://arxiv.org/abs/2605.24461) and [The Energy Blind Spot](https://arxiv.org/abs/2605.27599) are reminders that deployment bottlenecks include telemetry and power attribution, not only model throughput.
 
-Fourth, how do we separate source claims from architectural conclusions? Many papers make strong claims under particular workloads, hardware, and simulators. My interpretation is that the field is converging on a useful principle, not a settled answer: track data movement explicitly, then ask which mechanism changes the dominant path.
+Fourth, how do we separate source claims from architectural conclusions? Many papers make strong claims under particular workloads, hardware, and simulators. A useful interpretation is that the field is converging on a useful principle, not a settled answer: track data movement explicitly, then ask which mechanism changes the dominant path.
 
-That is the direction I will continue to follow across CENT, DREAM, ADAPT, Farm, GenDP, DX100, and GenomicsBench: architecture and interconnect modeling for distributed AI deployment, grounded in movement paths rather than accelerator narratives. The useful question is still the same one: which memory or interconnect tier dominates movement, and what mechanism actually shifts the bottleneck?
+The useful question is still the same one: which memory or interconnect tier dominates movement, and what mechanism actually shifts the bottleneck?
