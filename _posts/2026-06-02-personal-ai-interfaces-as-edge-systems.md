@@ -3,6 +3,8 @@ layout: post
 title: Personal AI Interfaces as Edge Systems
 date: 2026-06-02
 research_domain: R3
+lang: en
+translation_key: one-year-r3-personal-ai-interfaces
 tags:
 - edge-ai
 - bci

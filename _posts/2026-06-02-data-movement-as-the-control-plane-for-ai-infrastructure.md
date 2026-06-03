@@ -3,6 +3,8 @@ layout: post
 title: Data Movement as the Control Plane for AI Infrastructure
 date: 2026-06-02
 research_domain: R2
+lang: en
+translation_key: one-year-r2-data-movement-control-plane
 tags:
 - ai-infrastructure
 - systems

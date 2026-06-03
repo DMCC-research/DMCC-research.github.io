@@ -3,6 +3,8 @@ layout: post
 title: AI Serving Architecture After the KV Cache Became the System
 date: 2026-06-03
 research_domain: R1
+lang: en
+translation_key: one-year-r1-ai-serving-architecture
 tags:
 - ai-serving
 - systems

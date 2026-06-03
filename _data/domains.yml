@@ -1,18 +1,18 @@
-- id: D1
-  slug: memory-centric-agent-systems
-  title: Memory-Centric Systems for Long-Horizon Agents
-  title_zh: 长时程 Agent 的记忆中心系统
-  path: /domains/d1/
-  path_zh: /zh/domains/d1/
-- id: D2
-  slug: distributed-ai-architecture-modeling
-  title: Distributed AI Architecture and Modeling
-  title_zh: 分布式 AI 架构与建模
-  path: /domains/d2/
-  path_zh: /zh/domains/d2/
-- id: D3
-  slug: efficient-ai-deployment-runtime
-  title: Efficient AI Deployment Runtime
-  title_zh: 高效 AI 部署运行时
-  path: /domains/d3/
-  path_zh: /zh/domains/d3/
+- id: R1
+  slug: ai-serving-architecture-and-systems
+  title: AI Serving Architecture and Systems
+  title_zh: AI Serving 架构与系统
+  path: /domains/r1/
+  path_zh: /zh/domains/r1/
+- id: R2
+  slug: data-movement-centric-ai-infrastructure
+  title: Data Movement-Centric AI Infrastructure
+  title_zh: 数据移动中心的 AI 基础设施
+  path: /domains/r2/
+  path_zh: /zh/domains/r2/
+- id: R3
+  slug: personal-superintelligence-bci-hardware
+  title: Personal Superintelligence and BCI Hardware
+  title_zh: 个人超级智能与 BCI 硬件
+  path: /domains/r3/
+  path_zh: /zh/domains/r3/
