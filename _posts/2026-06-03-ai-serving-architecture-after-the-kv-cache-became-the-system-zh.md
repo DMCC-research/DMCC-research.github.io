@@ -24,7 +24,7 @@ end_date: '2026-06-02'
 
 ## KV Cache 成为基础设施
 
-早期工作通过 vLLM 等系统刻画 KV cache 在并发推理中的行为，说明 batch、prefill、decode、swap 和 recomputation 会共同决定吞吐与延迟。随后，RAG 场景把复用粒度从 prefix 扩展到 chunk 和共享文档。再往后，UniCache、PAT、RetroInfer、Oaken、RotateKV、ClusterKV 等工作分别从 eviction、prefix-aware attention、KV retrieval、量化和语义压缩角度处理同一个问题：哪些过去状态值得进入当前 token 的关键路径。
+早期工作通过 vLLM 等系统刻画 KV cache 在并发推理中的行为，例如 [Characterizing the Behavior and Impact of KV Caching on Transformer Inferences Under Concurrency](https://doi.org/10.1109/ipdps64566.2025.00108)，说明 batch、prefill、decode、swap 和 recomputation 会共同决定吞吐与延迟。随后，RAG 场景把复用粒度从 prefix 扩展到 chunk 和共享文档，例如 [Cache-Craft](https://doi.org/10.1145/3725273)。再往后，[UniCache](https://doi.org/10.1145/3805652)、[PAT](https://doi.org/10.1145/3779212.3790200)、[RetroInfer](https://doi.org/10.14778/3796195.3796212)、[Oaken](https://doi.org/10.1145/3695053.3731019)、[RotateKV](https://doi.org/10.24963/ijcai.2025/690)、[ClusterKV](https://doi.org/10.1109/dac63849.2025.11132479) 等工作分别从 eviction、prefix-aware attention、KV retrieval、量化和语义压缩角度处理同一个问题：哪些过去状态值得进入当前 token 的关键路径。
 
 一个有用判断是：KV 优化越来越像数据库 buffer management，而不是传统 kernel 优化。系统需要知道哪些状态可复用，哪些状态可以近似，哪些状态必须保留，哪些状态可以移动到 CPU、CXL、SSD 或远端。
 
@@ -32,11 +32,11 @@ end_date: '2026-06-02'
 
 长上下文让 decode 阶段更明显地受内存带宽和容量限制。许多论文通过 KV 压缩、低比特量化、稀疏检索或异构内存层级来降低压力。但这些机制的价值不只在压缩率，而在是否能稳定降低 tail latency，并且不破坏质量、隔离和 fallback。
 
-CXL、CPU-GPU 协同、FPGA KV cache、near-data processing、in-flash processing 和 storage-side RAG acceleration 都说明 HBM 不再是唯一的内存层级。问题是远端内存并不免费：如果调度、prefetch 和 admission control 无法控制移动成本，容量问题会变成尾延迟问题。
+[LIA](https://doi.org/10.1145/3695053.3731092) 这类 CPU-GPU 协同和 CXL offload 系统、[CXL-SpecKV](https://doi.org/10.1145/3748173.3779188) 这类 FPGA KV cache 设计、[AiF](https://doi.org/10.1145/3695053.3731073) 这类 in-flash processing，以及 [In-Storage Acceleration of Retrieval Augmented Generation as a Service](https://doi.org/10.1145/3695053.3731032) 这类 storage-side RAG acceleration 都说明 HBM 不再是唯一的内存层级。问题是远端内存并不免费：如果调度、prefetch 和 admission control 无法控制移动成本，容量问题会变成尾延迟问题。
 
 ## 调度成为架构核心
 
-prefill/decode disaggregation 让调度成为系统中心。WindServe、BanaServe、Apt-Serve、Mercury 等工作都显示：调度请求时也在调度 KV block、阶段资源、网络传输、cache locality 和 future reuse。未来 serving 平台需要同时理解 request、token、cache object、operator 和 transfer，而不是只优化 batch size。
+prefill/decode disaggregation 让调度成为系统中心。[WindServe](https://doi.org/10.1145/3695053.3730999)、[BanaServe](https://doi.org/10.1002/spe.70054)、[Apt-Serve](https://doi.org/10.1145/3725394)、[Mercury](https://doi.org/10.1145/3731569.3764798) 等工作都显示：调度请求时也在调度 KV block、阶段资源、网络传输、cache locality 和 future reuse。未来 serving 平台需要同时理解 request、token、cache object、operator 和 transfer，而不是只优化 batch size。
 
 RAG 和 multimodal serving 进一步把瓶颈移到模型外部。检索、embedding、存储访问、chunk reuse、provenance 和 per-user context 都会影响端到端 latency。更准确地说，AI serving 正在变成 context serving。
 
