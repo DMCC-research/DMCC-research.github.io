@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Personal AI Hardware Is Becoming a State-Movement Problem
-date: 2026-06-11
+date: 2026-06-07
 research_domain: R3
 tags:
 - personal-ai
@@ -15,6 +15,7 @@ start_date: '2026-05-31'
 end_date: '2026-06-07'
 research_domain_slug: personal-superintelligence-bci-hardware
 lang: en
+translation_key: weekly-2026-W23-r3
 ---
 
 This week’s useful signal for personal superintelligence and BCI hardware is mostly not classic BCI. The more important movement is in the substrate a neural or wearable interface would need: low-latency state estimation, edge inference, agent memory control, KV-cache reduction, and policy-enforced data movement.

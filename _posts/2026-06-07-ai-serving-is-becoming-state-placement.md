@@ -1,7 +1,7 @@
 ---
 layout: post
 title: AI Serving Is Becoming State Placement
-date: 2026-06-11
+date: 2026-06-07
 research_domain: R1
 tags:
 - ai-serving
@@ -15,6 +15,7 @@ start_date: '2026-05-31'
 end_date: '2026-06-07'
 research_domain_slug: ai-serving-architecture-and-systems
 lang: en
+translation_key: weekly-2026-W23-r1
 ---
 
 This week’s AI-serving papers point to the same systems problem: efficient inference is increasingly about controlling serving state, not just feeding GPUs with more FLOPs. Recent work on [mixed-precision KV transfer](https://arxiv.org/abs/2606.08635), [low-rank KV compression](https://arxiv.org/abs/2606.08382), [single-pass KV compaction](https://arxiv.org/abs/2606.07878), [semantic cache reconstruction](https://arxiv.org/abs/2606.07684), and [non-uniform KV allocation](https://arxiv.org/abs/2606.06302) all treats KV cache as something that can be moved, compressed, reconstructed, segmented, or claimed by a runtime.

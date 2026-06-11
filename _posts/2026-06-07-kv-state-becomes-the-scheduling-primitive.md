@@ -1,7 +1,7 @@
 ---
 layout: post
 title: KV State Becomes the Scheduling Primitive
-date: 2026-06-11
+date: 2026-06-07
 research_domain: R2
 tags:
 - ai-infrastructure
@@ -14,6 +14,7 @@ start_date: '2026-05-31'
 end_date: '2026-06-07'
 research_domain_slug: data-movement-centric-ai-infrastructure
 lang: en
+translation_key: weekly-2026-W23-r2
 ---
 
 AI serving systems are starting to treat KV cache as distributed state, not just runtime scratch space. The recent signal is concentrated: papers in this window explore per-token KV transfer precision, low-rank KV compression, cache compaction, semantic patching, non-uniform allocation, query-side movement, and runtime claims for residency.
