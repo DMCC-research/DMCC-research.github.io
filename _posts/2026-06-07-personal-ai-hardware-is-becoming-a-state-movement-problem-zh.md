@@ -1,15 +1,16 @@
 ---
 layout: post
 title: Personal AI Hardware 正在变成状态移动问题
-date: 2026-06-07
+date: '2026-06-07'
 research_domain: R3
 tags:
 - personal-ai
+- edge-ai
 - bci
-- edge-inference
 - agent-memory
-- secure-hardware
 - kv-cache
+- secure-hardware
+- ai-serving
 source_period: weekly
 start_date: '2026-05-31'
 end_date: '2026-06-07'
@@ -18,62 +19,50 @@ lang: zh
 translation_key: weekly-2026-W23-r3
 ---
 
-这一周对 personal superintelligence 和 BCI hardware 最有用的信号，大多不是传统 BCI 论文，而是神经接口或可穿戴接口真正需要的底层 substrate：low-latency state estimation、edge inference、agent memory control、KV-cache reduction 和 policy-enforced data movement。
+这一周对 personal AI hardware 最相关的更新不是新的 BCI chip，而是一组 agent-systems 论文从不同层面指出同一件事：有用的 personal AI 取决于 state 如何移动、在哪里保留、以及哪一层负责访问控制。
 
-机制层面的模式是一致的。未来 personal AI hardware 的约束不只是“模型是否足够聪明”，而是 state 住在哪里、移动频率有多高，以及系统能否避免移动原始个人上下文。
+这对 neural 和 wearable interfaces 很关键，因为它们的信号不只是输入。一旦某个信号影响 retrieval、cache state、tool choice 或 long-term memory，它就变成 agent runtime 的一部分。安全的 personal AI device 不应只被当作 passive sensor peripheral，而应被看作 memory-admission 和 policy-enforcement boundary。
 
-我的判断是：BCI 不应被当作孤立的 neural-decoding interface，而应被当作 private agent state machine 的一种输入路径。困难的系统问题不只是从身体中提取信号，而是决定哪些 derived state 可以进入 memory、context、KV cache、tools 和 long-term storage。
+## Agent Memory 正在变成 Runtime State
 
-## Edge Inference 不只是更小模型
+这一窗口内几篇论文把 memory 当作主动系统组件，而不是一堆可检索文本。[IntentKV](https://arxiv.org/abs/2606.09916) 用 session-level memory 和 slot-map eviction 做 cross-turn intent-aware KV cache pruning。[EMBER](https://arxiv.org/abs/2606.05894) 在 query 出现之前保留 source-backed evidence capsules，强调 budgeted evidence retention。[MemGate](https://arxiv.org/abs/2606.06054) 认为 personal-agent memory search 应该 task-conditioned，而不是只看 similarity，并且明确针对 cross-domain leakage。[MAGE / MemoryArena](https://arxiv.org/abs/2606.06090) 把 long-horizon memory 建模为 execution-state management，包含 hierarchical state trees 和 branch isolation。[SubtleMemory](https://arxiv.org/abs/2606.05761) 强调 fine-grained relational memory discrimination，而不是粗粒度语义召回。
 
-几篇更新都在降低靠近用户运行模型的代价。[APEX4](https://arxiv.org/abs/2606.08761) 通过平衡 Tensor Cores 和 CUDA Cores 的 intra-SM work 来支持 pure W4A4 LLM inference，把 dequantization overhead 变成 serving architecture 的一部分，而不是实现细节。[STAR-KV](https://arxiv.org/abs/2606.08382) 用 adaptive low-rank control 压缩 KV cache，[IntentKV](https://arxiv.org/abs/2606.09916) 用 session intent 和 slot-map eviction 修剪跨轮 agent KV state。[Vortex](https://arxiv.org/abs/2606.06453) 则通过 page-centric tensor abstraction 让 sparse attention serving 可编程。
+机制很直接：interaction streams 会被提升成 KV cache、retrieved memories、compressed evidence、execution metadata 和 policy logs。对 personal AI 来说，硬件问题是这个 promotion 发生在哪里。手机、wearable、headset、neural-interface module 都可能决定哪些 raw signals 永远不离开 local buffer，哪些 feature 可以进入 short-lived session state，哪些 event 可以成为 durable agent memory。
 
-对 personal AI hardware 来说，共同点不只是 compression，而是 movement control。parameters、activations、KV cache、attention pages、sensor features 和 retrieval payloads 都变成需要被放置、复用、驱逐或永不 materialize 的 state objects。
+我的判断是，R3 的近中期硬件抽象不应该是“BCI 作为更快输入设备”，而应该是“wearable 和 neural hardware 作为受控 state boundary”。设备的价值在于它能决定什么不需要 serialize。
 
-这对 wearable 和 neural interface 很重要，因为原始输入流是连续、私密且经常低价值的。设备不应该总是把每个信号窗口都翻译成完整模型执行。[FakeInf](https://doi.org/10.1145/3773274.3774270) 把 selective inference 表达得很明确：当数据 volatility 低时，serving pipeline 可以在 latency 和 energy 约束下跳过推理。对可穿戴设备来说，inference admission control 可能和 quantization 一样重要。
+## KV Cache 是 Personal State
 
-## Personal Memory 是 Trust Boundary
+cache 和 sparse-attention 论文从 serving 侧指向同一瓶颈。[STAR-KV](https://arxiv.org/abs/2606.08382) 使用 adaptive low-rank control 和 head-block sensitivity 压缩 KV cache。[Vortex](https://arxiv.org/abs/2606.06453) 用 page-centric tensor abstraction 支持 programmable sparse attention serving。[APEX4](https://arxiv.org/abs/2606.08761) 研究 W4A4 inference，并指出 dequantization 和 intra-SM compute balance 是现实瓶颈。[RKSC](https://arxiv.org/abs/2606.09937) 结合 reasoning-aware KV sharing、confidence-gated early exit 和 selective eviction。[FlashCP](https://arxiv.org/abs/2606.08476) 通过 sharding changes 降低 context-parallel KV communication。
 
-这一周最清晰的安全信号是：personal AI privacy 不能止步于 encrypted storage。如果 wearable 或 BCI 产生 embeddings、summaries、inferred preferences、task traces 或跨域关联，敏感对象往往是 derived state，而不仅是原始信号。
+共同系统目标是每个有用推理步骤移动更少 state。这个目标可以直接映射到 personal AI。如果一个 assistant 携带数月用户上下文，系统不可能反复让完整 conversation history、完整 KV state 和大范围 private memory 经过昂贵路径。runtime 需要 selective survival：哪些 state 保持 resident，哪些被压缩，哪些被驱逐，哪些被禁止复用。
 
-[MemGate](https://arxiv.org/abs/2606.06054) 把 personal agent 的 memory retrieval 建模为 task-conditioned admission，而不是单纯 similarity search。[EMBER](https://arxiv.org/abs/2606.05894) 把 long-horizon agent memory 看成 budgeted evidence retention，在未来 query 尚未出现时保存 source-backed evidence capsules。[MAGE / MemoryArena](https://arxiv.org/abs/2606.06090) 把 memory 作为 execution state，包含 hierarchical state trees、active paths、branch isolation 和 summary validation。[SubtleMemory](https://arxiv.org/abs/2606.05761) 则强调 agent 需要 fine-grained relational memory discrimination，而不是粗粒度 retrieval。
+这也约束 BCI 叙事。低延迟 neural control signal 只有在下游 agent runtime 不被 stale cache reads、不必要 retrieval 或过量 private-context movement 主导时才有意义。
 
-更强的 infrastructure claim 来自 [Data Flow Control](https://arxiv.org/abs/2606.05679)：它为 AI-agent data safety 提出 tuple-level policies、provenance、query rewriting 和 optimizer-invariant enforcement。翻译到 R3，这说明 personal AI device 需要一个缺失的 hardware/software boundary：系统要强制规定哪些 sensor-derived features、memories、summaries 和 retrieval results 能流入哪些任务。
+## Trust Boundary 下沉到 Agent 之下
 
-一个把所有东西都存在本地、但任意混合不同上下文记忆的系统，并不等于真正私密。控制面必须治理 admission、retrieval、joining、summarization、tool exposure 和 durable writes。
+安全相关工作也把 enforcement 放到 prompt-level behavior 之下。[Data Flow Control](https://arxiv.org/abs/2606.05679) 为 AI agents 提出 tuple-level data-flow policies，使用 provenance-aware enforcement 和 query rewriting。[MemGate](https://arxiv.org/abs/2606.06054) 把 memory admission 作为 personal agents 的 trust boundary。[AgentTrust](https://arxiv.org/abs/2606.08539) 围绕 agent actions 加入 trust layer，使用 self-distilled rules 和 guarded precedent memory。[Causal Agent Replay](https://arxiv.org/abs/2606.08275) 通过 counterfactual replay 和 point-of-commitment attribution 分析 failure。
 
-## Wearables 需要 State Estimation，而不只是 Sensing
+对 wearable 或 neural data 来说，这是值得关注的安全模型。敏感数据可能在变成明显语义事实之前泄露：gaze、heart rate、timing、location、audio fragments 和 neural features 都可能暴露 intent 或 health state。data、memory 和 tool 层的 hardware-backed enforcement，比依赖模型记住隐私规则更可信。
 
-BCI 或 wearable stack 本质上是 telemetry system：多路异步流、噪声观测、局部上下文、设备可用性变化和严格 latency budget。因此，一些非 neuroscience 的 infrastructure 论文也很相关。
+## Telemetry Compression 像 Personal-AI Primitive
 
-[LPSE](https://arxiv.org/abs/2606.08869) 为 dynamic network monitoring 提出 low-latency semantic state estimator，使用 latent predictive learning、semantic codebooks、slot-routed node representations 和 fixed-cost inference 处理 variable-cardinality telemetry。虽然领域是 network orchestration，但抽象可以迁移到 personal AI：许多变化输入需要被压缩成有界成本的 state representation。
+第二组信号来自 orchestration 和 observability。[LPSE](https://arxiv.org/abs/2606.08869) 为 dynamic network monitoring 提出 low-latency semantic state estimation，包含 latent predictive state、semantic codebooks、fixed-cost inference 和 slot-routed node representations。[Auditable Graph-Guided RCA](https://arxiv.org/abs/2606.08590) 用 typed incident graphs、bounded traversal、validation 和 telemetry leakage checks 处理 Kubernetes incidents。[TimeClaw](https://arxiv.org/abs/2606.05404) 把 generalist agents 用于 contextualized time-series，并结合 temporal tools 和 episodic multimodal memory。
 
-[Auditable graph-guided RCA](https://arxiv.org/abs/2606.08590) 用 typed incident graphs、bounded traversal、verdict validation 和 telemetry leakage checks 组织 Kubernetes diagnosis。[TimeClaw](https://arxiv.org/abs/2606.05404) 把 generalist agents 用于 contextualized time series，结合 temporal tools、episodic multimodal memory 和 auditable analysis。它们不是 BCI 系统，但为 streaming observations 的 bounded、queryable 和 inspectable 处理提供了模板。
+这些不是 wearable 论文，但机制可以迁移。personal AI device fleet 是一个小型 distributed system：sensors、earbuds、glasses、phone、local accelerator、secure enclave 和 cloud fallback。raw telemetry 不应该持续向上移动；local state estimator 应该总结什么变化了、什么重要、什么需要 agent attention。
 
-需要保持怀疑：Kubernetes telemetry 不是 neural telemetry。真正可迁移的是在 streaming、partial、resource-constrained observation 下做 semantic state estimation 的机制。
+风险是 semantic compression 也可能成为 semantic leakage。一个 compact latent state 传输成本更低，但用户可能更难 inspect、redact 或 delete。R3 应该追踪这些系统是否保留 provenance 和 deletion semantics，而不只是 latency。
 
-## Long-Horizon Agents 让 Context 成为系统税
+## Edge Adaptation 仍然不够具体
 
-personal superintelligence 从操作上意味着跨时间连续性，因此 context cost 会成为核心系统税。
+edge-learning 论文相关，但对 personal-hardware agenda 还不够成熟。[AlignFed](https://arxiv.org/abs/2606.08197) 研究异构 edge devices 上的 asynchronous federated fine-tuning，包括 version-aware update grouping 和 stale-update drift。[PIPE-Cypher](https://arxiv.org/abs/2606.08481) 用 schema-specific generation、execution validation 和 redaction 构建 enterprise text-to-Cypher benchmarks。长程评测如 [SWE-Marathon](https://arxiv.org/abs/2606.07682)、[Agents' Last Exam](https://arxiv.org/abs/2606.05405) 和一个 [neuroscience agent-evaluation case study](https://arxiv.org/abs/2606.07718) 都强调 extended workflows 中的 verification。
 
-[Sparrow](https://arxiv.org/abs/2606.08446) 研究 efficient long-context RL 的 sparse rollout，包括 rollout cost model 和 dynamic sparsity schedule。[SWE-Marathon](https://arxiv.org/abs/2606.07682) 展示 ultra-long-horizon software agents 会产生巨大的 token rollout、self-verification failure 和 reward-hacking risk。[FlashCP](https://arxiv.org/abs/2606.08476) 通过改变 sequence 和 KV movement 降低 context parallelism 通信。[Continuous Semantic Caching](https://arxiv.org/abs/2604.20021) 则把 low-cost LLM serving 看成 continuous query space 上的 online caching problem。
-
-对 personal AI 来说，这些论文共同指向同一个设计问题：working memory 住在哪里？有些 state 应该在 device DRAM 或 SRAM 中服务即时交互；有些应该在 local flash 中成为私有长期记忆；有些需要 secure enclave 保护；有些可能为了高吞吐存在 edge/cloud KV cache；还有一些应该存在带 provenance-aware retrieval 的 policy-controlled database 中。
-
-没有单篇论文解决完整 placement model。但方向很清楚：agent memory 正在变成 memory hierarchy 和 movement problem。
-
-## Edge 侧硬件信号
-
-几篇论文让硬件方向更具体。[AiF](https://doi.org/10.1145/3695053.3731073) 研究 on-device LLM inference 的 in-flash processing，用 NAND 内部带宽处理 parameter streaming bottleneck。[Pegasus](https://doi.org/10.1145/3718958.3750529) 探索在 dataplane 上用 P4 和 primitive fusion 做 deep learning inference。[BitMedViT](https://doi.org/10.1109/iccad66269.2025.11240999) 用 ternary quantization 和 custom kernels 在 Jetson Orin Nano 上支持 edge medical AI assistant。一个 [Raspberry Pi / K3s edge LLM evaluation](https://doi.org/10.1109/icc52391.2025.11161569) 则测量 CPU-only inference 和 edge throughput-latency tradeoff。
-
-R3 关联是间接但真实的。neural 和 wearable signals 通常应该在 sensor 附近先被降低维度，因为原始流高频且隐私敏感。如果 personal AI memory 和 parameters 默认驻留在 flash，那么 near-storage compute、quantized kernels 和 local admission policies 都可能成为私有 personal AI device 的构件。
+对 personal AI hardware 来说，“edge learning”这个说法不够精确。真正重要的是移动了什么：gradients、LoRA deltas、embeddings、summaries、traces、benchmark items，还是 raw sensor data。特别是在 deletion、provenance 和 heterogeneous device versions 重要时，retrieval gate 和 memory gate 的 local adaptation 可能比 full model fine-tuning 更实际。
 
 ## 接下来应该看什么
 
-下一步有价值的综合，可以把 [IntentKV](https://arxiv.org/abs/2606.09916)、[STAR-KV](https://arxiv.org/abs/2606.08382) 和 [Vortex](https://arxiv.org/abs/2606.06453) 连接成 agent 的 KV/context movement stack。
+这一周的缺口也有信息量：直接关于 neural front-end chips、wearable inference ASICs 或 secure neural data paths 的证据不多。更强的近期信号是这些硬件必须接入的 runtime substrate。
 
-另一篇硬件笔记应该看 [AiF](https://doi.org/10.1145/3695053.3731073)，尤其是当 flash bandwidth 主导设备时，它能否成为 local personal-memory serving 的模型。
+下一步应建立 personal AI hardware 的 state hierarchy：raw sensor buffer、feature stream、session KV、episodic memory、evidence capsule、long-term profile 和 policy log。[IntentKV](https://arxiv.org/abs/2606.09916)、[STAR-KV](https://arxiv.org/abs/2606.08382)、[Vortex](https://arxiv.org/abs/2606.06453)、[Data Flow Control](https://arxiv.org/abs/2606.05679)、[MemGate](https://arxiv.org/abs/2606.06054) 和 [LPSE](https://arxiv.org/abs/2606.08869) 有价值，是因为它们暴露了 state 在哪里被创建、压缩、复用、阻断或移动。
 
-安全线索应该继续从 [MemGate](https://arxiv.org/abs/2606.06054) 和 [Data Flow Control](https://arxiv.org/abs/2606.05679) 往下走：personal AI 需要低于应用层的 memory admission 和 data-flow enforcement。
-
-BCI-specific scout target 仍然更窄：on-sensor feature extraction、用于 derived neural state 的 secure enclave、neural-signal compression，以及 wearable streams 的 inference admission control。
+这就是 secure personal AI 的系统形状：不只是更好的传感器，也不只是更小的模型，而是对 state movement 更严格的控制。
