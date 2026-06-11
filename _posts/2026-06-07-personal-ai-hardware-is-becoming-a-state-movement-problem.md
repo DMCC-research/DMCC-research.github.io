@@ -1,15 +1,16 @@
 ---
 layout: post
 title: Personal AI Hardware Is Becoming a State-Movement Problem
-date: 2026-06-07
+date: '2026-06-07'
 research_domain: R3
 tags:
 - personal-ai
+- edge-ai
 - bci
-- edge-inference
 - agent-memory
-- secure-hardware
 - kv-cache
+- secure-hardware
+- ai-serving
 source_period: weekly
 start_date: '2026-05-31'
 end_date: '2026-06-07'
@@ -18,62 +19,50 @@ lang: en
 translation_key: weekly-2026-W23-r3
 ---
 
-This week’s useful signal for personal superintelligence and BCI hardware is mostly not classic BCI. The more important movement is in the substrate a neural or wearable interface would need: low-latency state estimation, edge inference, agent memory control, KV-cache reduction, and policy-enforced data movement.
+The most relevant update for personal AI hardware this week is not a new BCI chip. It is a set of agent-systems papers that make the same point from different layers: useful personal AI will depend on how state moves, where it is retained, and which layer enforces access.
 
-The mechanism-level pattern is consistent. Future personal AI hardware will be constrained less by “model intelligence” in isolation and more by where state lives, how often it moves, and whether the system can avoid moving raw personal context at all.
+That matters for neural and wearable interfaces because their signals are not just inputs. Once a signal influences retrieval, cache state, tool choice, or long-term memory, it becomes part of the agent runtime. A secure personal AI device should therefore be evaluated less like a passive sensor peripheral and more like a memory-admission and policy-enforcement boundary.
 
-My judgment for this research agenda: BCI should be treated less as a standalone neural-decoding interface and more as one input path into a private agent state machine. The hard systems problem is not only extracting signals from the body. It is deciding which derived state can enter memory, context, KV cache, tools, and long-term storage.
+## Agent Memory Is Becoming Runtime State
 
-## Edge Inference Is Not Just Smaller Models
+Several papers from this window treat memory as an active systems component rather than a pile of retrieved text. [IntentKV](https://arxiv.org/abs/2606.09916) proposes cross-turn, intent-aware KV cache pruning with session-level memory and slot-map eviction. [EMBER](https://arxiv.org/abs/2606.05894) focuses on budgeted evidence retention before the query, using source-backed evidence capsules. [MemGate](https://arxiv.org/abs/2606.06054) argues that personal-agent memory search should be task-conditioned rather than similarity-only, explicitly targeting cross-domain leakage. [MAGE / MemoryArena](https://arxiv.org/abs/2606.06090) models long-horizon memory as execution-state management with hierarchical state trees and branch isolation. [SubtleMemory](https://arxiv.org/abs/2606.05761) stresses fine-grained relational memory discrimination rather than coarse semantic recall.
 
-Several updates this week attack the cost of running models close to users. [APEX4](https://arxiv.org/abs/2606.08761) targets pure W4A4 LLM inference by rebalancing intra-SM work between Tensor Cores and CUDA Cores, making dequantization overhead part of the serving architecture rather than a side detail. [STAR-KV](https://arxiv.org/abs/2606.08382) compresses KV cache with adaptive low-rank control, while [IntentKV](https://arxiv.org/abs/2606.09916) prunes cross-turn agent KV state using session intent and slot-map eviction. [Vortex](https://arxiv.org/abs/2606.06453) makes sparse attention serving programmable through a page-centric tensor abstraction.
+The mechanism is straightforward: interaction streams become KV cache, retrieved memories, compressed evidence, execution metadata, and policy logs. For personal AI, the interesting hardware question is where that promotion happens. A phone, wearable, headset, or neural-interface module could decide which raw signals never leave a local buffer, which features can enter short-lived session state, and which events can become durable agent memory.
 
-For personal AI hardware, the common point is not just compression. It is movement control. Parameters, activations, KV cache, attention pages, sensor features, and retrieval payloads become state objects that have to be placed, reused, evicted, or never materialized.
+My judgment for R3 is that this is the right abstraction for near-term personal AI hardware: not “BCI as a faster input device,” but “wearable and neural hardware as a controlled state boundary.” The device is valuable when it can decide what not to serialize.
 
-That matters for wearable and neural interfaces because their raw input streams are continuous, private, and often low-value at any given instant. A device should not always translate every signal into full model execution. [FakeInf](https://doi.org/10.1145/3773274.3774270), surfaced in this window, makes selective inference explicit: when data volatility is low, a serving pipeline can skip inference under latency and energy constraints. For wearables, inference admission control may matter as much as quantization.
+## KV Cache Is Personal State
 
-## Personal Memory Is A Trust Boundary
+The cache and sparse-attention papers point at the same bottleneck from the serving side. [STAR-KV](https://arxiv.org/abs/2606.08382) compresses KV cache using adaptive low-rank control and head-block sensitivity. [Vortex](https://arxiv.org/abs/2606.06453) proposes programmable sparse attention serving with page-centric tensor abstractions. [APEX4](https://arxiv.org/abs/2606.08761) studies W4A4 inference and identifies dequantization and intra-SM compute balance as practical bottlenecks. [RKSC](https://arxiv.org/abs/2606.09937) combines reasoning-aware KV sharing, confidence-gated early exit, and selective eviction. [FlashCP](https://arxiv.org/abs/2606.08476) reduces context-parallel KV communication through sharding changes.
 
-The clearest security signal this week is that personal AI privacy cannot stop at encrypted storage. If a wearable or BCI produces embeddings, summaries, inferred preferences, task traces, or cross-domain associations, the sensitive object is often the derived state rather than the raw signal alone.
+The shared systems goal is less state movement per useful inference step. That goal maps directly onto personal AI. If an assistant carries months of user context, the system cannot repeatedly move full conversation history, full KV state, and broad private memory through expensive paths. The runtime needs selective survival: which state remains resident, which state is compressed, which state is evicted, and which state is blocked from reuse.
 
-[MemGate](https://arxiv.org/abs/2606.06054) frames memory retrieval for personal agents as task-conditioned admission rather than similarity search alone. [EMBER](https://arxiv.org/abs/2606.05894) treats long-horizon agent memory as budgeted evidence retention, using source-backed evidence capsules before the future query is known. [MAGE / MemoryArena](https://arxiv.org/abs/2606.06090) models memory as execution state with hierarchical state trees, active paths, branch isolation, and summary validation. [SubtleMemory](https://arxiv.org/abs/2606.05761) stresses that agents need fine-grained relational memory discrimination, not just coarse retrieval.
+This also disciplines the BCI story. A low-latency neural control signal is useful only if the downstream agent runtime is not dominated by stale cache reads, unnecessary retrieval, or excessive private-context movement.
 
-The stronger infrastructure claim comes from [Data Flow Control](https://arxiv.org/abs/2606.05679), which proposes tuple-level policies over provenance, query rewriting, and optimizer-invariant enforcement for AI-agent data safety. Translated to R3, this points to a missing hardware/software boundary: a personal AI device should enforce which sensor-derived features, memories, summaries, and retrieval results can flow into which tasks.
+## Trust Boundaries Move Below The Agent
 
-A local system that stores everything on-device but freely mixes memories across contexts is not meaningfully private. The control plane has to govern admission, retrieval, joining, summarization, tool exposure, and durable writes.
+Security-relevant work this week also moves enforcement below prompt-level behavior. [Data Flow Control](https://arxiv.org/abs/2606.05679) proposes tuple-level data-flow policies for AI agents, using provenance-aware enforcement and query rewriting. [MemGate](https://arxiv.org/abs/2606.06054) treats memory admission as a trust boundary for personal agents. [AgentTrust](https://arxiv.org/abs/2606.08539) adds a trust layer around agent actions using self-distilled rules and guarded precedent memory. [Causal Agent Replay](https://arxiv.org/abs/2606.08275) analyzes failures through counterfactual replay and point-of-commitment attribution.
 
-## Wearables Need State Estimation, Not Only Sensing
+For wearable or neural data, this is the security model to watch. Sensitive data can leak before it becomes an obvious semantic fact: gaze, heart rate, timing, location, audio fragments, and neural features may expose intent or health state. Hardware-backed enforcement at the data, memory, and tool layers is more credible than relying on the model to remember privacy rules.
 
-A BCI or wearable stack is a telemetry system: multiple asynchronous streams, noisy observations, partial context, changing device availability, and strict latency budgets. This is why infrastructure papers from outside neuroscience are relevant.
+## Telemetry Compression Looks Like A Personal-AI Primitive
 
-[LPSE](https://arxiv.org/abs/2606.08869) proposes a low-latency semantic state estimator for dynamic network monitoring, using latent predictive learning, semantic codebooks, slot-routed node representations, and fixed-cost inference over variable-cardinality telemetry. The domain is network orchestration, but the abstraction maps cleanly to personal AI: many changing inputs need to become a bounded-cost state representation.
+A second cluster comes from orchestration and observability. [LPSE](https://arxiv.org/abs/2606.08869) proposes low-latency semantic state estimation for dynamic network monitoring with latent predictive state, semantic codebooks, fixed-cost inference, and slot-routed node representations. [Auditable Graph-Guided RCA](https://arxiv.org/abs/2606.08590) uses typed incident graphs, bounded traversal, validation, and telemetry leakage checks for Kubernetes incidents. [TimeClaw](https://arxiv.org/abs/2606.05404) applies generalist agents to contextualized time-series using temporal tools and episodic multimodal memory.
 
-[Auditable graph-guided RCA](https://arxiv.org/abs/2606.08590) structures Kubernetes diagnosis around typed incident graphs, bounded traversal, verdict validation, and telemetry leakage checks. [TimeClaw](https://arxiv.org/abs/2606.05404) applies generalist agents to contextualized time series with temporal tools, episodic multimodal memory, and auditable analysis. These are not BCI systems, but they are useful templates for making streaming observations queryable, bounded, and inspectable.
+These are not wearable papers, but the mechanism transfers. A personal AI device fleet is a small distributed system: sensors, earbuds, glasses, phone, local accelerator, secure enclave, and cloud fallback. Raw telemetry should not continuously move upward. Local state estimators should summarize what changed, what matters, and what needs agent attention.
 
-The skeptical caveat is important: Kubernetes telemetry is not neural telemetry. The transferable mechanism is semantic state estimation under streaming, partial, resource-constrained observation.
+The risk is that semantic compression can become semantic leakage. A compact latent state may be cheaper to transmit but harder for a user to inspect, redact, or delete. R3 should track whether these systems preserve provenance and deletion semantics, not just latency.
 
-## Long-Horizon Agents Make Context The Tax
+## Edge Adaptation Is Still Underspecified
 
-Personal superintelligence, operationally, implies continuity across time. That makes context cost a central systems tax.
+The edge-learning papers are relevant but less mature for the personal-hardware agenda. [AlignFed](https://arxiv.org/abs/2606.08197) studies asynchronous federated fine-tuning for LLMs across heterogeneous edge devices, including version-aware update grouping and stale-update drift. [PIPE-Cypher](https://arxiv.org/abs/2606.08481) builds enterprise text-to-Cypher benchmarks with schema-specific generation, execution validation, and redaction. Long-horizon evaluations such as [SWE-Marathon](https://arxiv.org/abs/2606.07682), [Agents’ Last Exam](https://arxiv.org/abs/2606.05405), and a [neuroscience agent-evaluation case study](https://arxiv.org/abs/2606.07718) emphasize verification over extended workflows.
 
-[Sparrow](https://arxiv.org/abs/2606.08446) studies sparse rollout for efficient long-context RL, including rollout cost models and dynamic sparsity schedules. [SWE-Marathon](https://arxiv.org/abs/2606.07682) stresses how ultra-long-horizon software agents produce enormous token rollouts, self-verification failures, and reward-hacking risks. [FlashCP](https://arxiv.org/abs/2606.08476) reduces communication in context parallelism by changing how sequence and KV movement are handled. [Continuous Semantic Caching](https://arxiv.org/abs/2604.20021) frames low-cost LLM serving as an online caching problem over continuous query space.
-
-For personal AI, these papers point to the same design question: where does working memory live? Some state belongs in on-device DRAM or SRAM for immediate interaction. Some belongs in local flash for private long-term memory. Some may need secure enclave protection. Some may sit in edge or cloud KV cache for high-throughput serving. Some should live in a policy-controlled database with provenance-aware retrieval.
-
-No single paper solves that placement model. But the direction is clear: agent memory is becoming a memory hierarchy and movement problem.
-
-## Hardware Signals Around The Edge
-
-Several surfaced papers make the hardware direction more concrete. [AiF](https://doi.org/10.1145/3695053.3731073) studies in-flash processing for on-device LLM inference, targeting parameter streaming bottlenecks with internal NAND bandwidth. [Pegasus](https://doi.org/10.1145/3718958.3750529) explores deep learning inference on the dataplane using P4 and primitive fusion. [BitMedViT](https://doi.org/10.1109/iccad66269.2025.11240999) uses ternary quantization and custom kernels for edge medical AI assistants on Jetson Orin Nano. A [Raspberry Pi / K3s edge LLM evaluation](https://doi.org/10.1109/icc52391.2025.11161569) measures CPU-only inference and edge throughput-latency tradeoffs.
-
-The R3 relevance is indirect but real. Neural and wearable signals should usually be reduced near the sensor, because raw streams are high-frequency and privacy-sensitive. If personal AI memory and parameters are flash-resident by default, then near-storage compute, quantized kernels, and local admission policies become plausible building blocks for private personal AI devices.
+For personal AI hardware, “edge learning” is not precise enough. The important question is what moves: gradients, LoRA deltas, embeddings, summaries, traces, benchmark items, or raw sensor data. Local adaptation of retrieval and memory gates may be more immediately useful than full model fine-tuning, especially when deletion, provenance, and heterogeneous device versions matter.
 
 ## What To Watch Next
 
-The next useful synthesis should connect [IntentKV](https://arxiv.org/abs/2606.09916), [STAR-KV](https://arxiv.org/abs/2606.08382), and [Vortex](https://arxiv.org/abs/2606.06453) as a KV/context movement stack for agents.
+The absence this week is instructive: there is little direct evidence on neural front-end chips, wearable inference ASICs, or secure neural data paths. The stronger recent signal is the runtime substrate that such hardware would have to join.
 
-A separate hardware note should look at [AiF](https://doi.org/10.1145/3695053.3731073) as a model for local personal-memory serving, especially when flash bandwidth dominates the device.
+The practical taxonomy to build next is a state hierarchy for personal AI hardware: raw sensor buffer, feature stream, session KV, episodic memory, evidence capsule, long-term profile, and policy log. Papers like [IntentKV](https://arxiv.org/abs/2606.09916), [STAR-KV](https://arxiv.org/abs/2606.08382), [Vortex](https://arxiv.org/abs/2606.06453), [Data Flow Control](https://arxiv.org/abs/2606.05679), [MemGate](https://arxiv.org/abs/2606.06054), and [LPSE](https://arxiv.org/abs/2606.08869) are useful because they expose where state is created, compressed, reused, blocked, or moved.
 
-The security thread should continue from [MemGate](https://arxiv.org/abs/2606.06054) and [Data Flow Control](https://arxiv.org/abs/2606.05679): personal AI needs memory admission and data-flow enforcement below the application layer.
-
-The BCI-specific scout target remains narrower: on-sensor feature extraction, secure enclaves for derived neural state, neural-signal compression, and inference admission control for wearable streams.
+That is the systems shape of secure personal AI: not only better sensors, and not only smaller models, but stricter control over state movement.
