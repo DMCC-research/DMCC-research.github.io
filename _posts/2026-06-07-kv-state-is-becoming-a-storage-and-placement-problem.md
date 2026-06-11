@@ -3,6 +3,7 @@ layout: post
 title: KV State Is Becoming a Storage and Placement Problem
 date: 2026-06-07
 research_domain: R2
+lang: en
 tags:
 - ai-infrastructure
 - kv-cache

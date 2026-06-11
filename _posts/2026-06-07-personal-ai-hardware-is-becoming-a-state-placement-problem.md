@@ -3,6 +3,7 @@ layout: post
 title: Personal AI Hardware Is Becoming a State Placement Problem
 date: 2026-06-07
 research_domain: R3
+lang: en
 tags:
 - personal-ai
 - edge-ai

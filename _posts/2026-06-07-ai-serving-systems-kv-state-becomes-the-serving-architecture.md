@@ -3,6 +3,7 @@ layout: post
 title: 'AI Serving Systems: KV State Becomes the Serving Architecture'
 date: 2026-06-07
 research_domain: R1
+lang: en
 tags:
 - ai-serving
 - llm-inference
