@@ -11,7 +11,7 @@ tags:
 - scheduling
 - hardware-architecture
 source_period: weekly
-start_date: '2026-06-07'
+start_date: '2026-06-08'
 end_date: '2026-06-14'
 research_domain_slug: ai-serving-architecture-and-systems
 lang: zh
@@ -24,13 +24,13 @@ translation_key: weekly-2026-W24-r1
 
 ## KV 与 Context 正在变成 Runtime Objects
 
-几篇论文把 context 当成 serving system 应该显式放置、转换和复用的对象。[MiniPIC](https://arxiv.org/abs/2606.13126) 通过 unrotated K cache、logical positions、cache-reuse primitives 和 block-level causal attention 实现 position-independent prompt/cache reuse。[SpectrumKV](https://arxiv.org/abs/2606.08635) 面向 prefill-decode disaggregated serving，为 KV transfer 做 per-token mixed precision。[ITME](https://arxiv.org/abs/2606.12556) 提出 tiered inference memory system，把 accelerator memory、CXL-hybrid memory、NVMe SSD、proactive data movement 和 shared context layer 放在同一设计里。[STAR-KV](https://arxiv.org/abs/2606.08382) 则在 head/block granularity 做 adaptive low-rank KV compression。
+几篇论文把 context 当成 serving system 应该显式放置、转换和复用的对象。[MiniPIC](https://arxiv.org/abs/2606.13126) 通过 unrotated K cache、logical positions、cache-reuse primitives 和 block-level causal attention 实现 position-independent prompt/cache reuse。[ITME](https://arxiv.org/abs/2606.12556) 提出 tiered inference memory system，把 accelerator memory、CXL-hybrid memory、NVMe SSD、proactive data movement 和 shared context layer 放在同一设计里。
 
-共同模式是：context 已经有多种物理形式。它可以是 GPU HBM 中的 resident KV、传输用 quantized KV、存储用 low-rank KV、compressed latent context、可复用 prefix blocks，或 query-critical sparse subsets。[End-to-End Context Compression at Scale](https://arxiv.org/abs/2606.09659)、[Express Language Modeling](https://arxiv.org/abs/2606.10944)、[FlashMemory-DeepSeek-V4](https://arxiv.org/abs/2606.09079) 和 [Context-Driven Incremental Compression](https://arxiv.org/abs/2606.12411) 都从不同角度说明了这一点。
+共同模式是：context 已经有多种物理形式。它可以是 GPU HBM 中的 resident KV、compressed latent context、可复用 prefix blocks、tiered context memory，或 query-critical sparse subsets。[End-to-End Context Compression at Scale](https://arxiv.org/abs/2606.09659)、[Express Language Modeling](https://arxiv.org/abs/2606.10944)、[FlashMemory-DeepSeek-V4](https://arxiv.org/abs/2606.09079) 和 [Context-Driven Incremental Compression](https://arxiv.org/abs/2606.12411) 都从不同角度说明了这一点。
 
-我的判断是，缺失的抽象是 state-placement contract。serving runtime 应该知道一个 context segment 是否 position-dependent、是否 compressed、是否 quantized、是否驻留在 HBM、是否停在 CXL memory、能否从 prefix cache 重建，以及能否跨 turn 安全复用。否则 [MiniPIC](https://arxiv.org/abs/2606.13126)、[SpectrumKV](https://arxiv.org/abs/2606.08635)、[ITME](https://arxiv.org/abs/2606.12556) 和 [STAR-KV](https://arxiv.org/abs/2606.08382) 这类机制仍然只是孤立优化，而不是统一 serving architecture 的组成部分。
+我的判断是，缺失的抽象是 state-placement contract。serving runtime 应该知道一个 context segment 是否 position-dependent、是否 compressed、是否驻留在 HBM、是否停在 CXL memory、能否从 prefix cache 重建，以及能否跨 turn 安全复用。否则 [MiniPIC](https://arxiv.org/abs/2606.13126) 和 [ITME](https://arxiv.org/abs/2606.12556) 这类机制仍然只是孤立优化，而不是统一 serving architecture 的组成部分。
 
-需要警惕的是 metadata、decompression、position correction 和 cache bookkeeping 是否会成为新的 latency path。这个问题在 position-independent caching、mixed-precision KV transfer、low-rank KV compression 和 tiered memory movement 中都很明显。
+需要警惕的是 metadata、decompression、position correction 和 cache bookkeeping 是否会成为新的 latency path。这个问题在 position-independent caching、tiered memory movement、latent compression 和 sparse residency 中都很明显。
 
 ## Scheduling 正在下沉到 Request 之下
 
@@ -44,7 +44,7 @@ translation_key: weekly-2026-W24-r1
 
 近期 decode work 没有收敛到单一机制，而是在 speculation、multi-token prediction、low precision 和 early intervention 之间分化。[Teaching Diffusion to Speculate Left-to-Right](https://arxiv.org/abs/2606.11552) 用 diffusion-style draft generation 做 speculative decoding；[K-Forcing](https://arxiv.org/abs/2606.10820) 为 memory-bound autoregressive serving 提出 joint next-k-token decoding；[Breaking Entropy Bounds](https://arxiv.org/abs/2606.12370) 把 multi-token prediction 和 rejection sampling 用于加速 RL rollout generation。
 
-低精度 decode 也在变得更动态。[ReSET](https://arxiv.org/abs/2606.13233) 面向 latency-critical NVFP4 reasoning，用 step-aware temperature scaling 处理 quantization-induced sampling error。[APEX4](https://arxiv.org/abs/2606.08761) 通过 intra-SM compute rebalancing 支持 pure W4A4 inference，关注 Tensor Core 与 CUDA Core work 的平衡。[Multi-Bitwidth Quantization](https://arxiv.org/abs/2606.12876) 用 additive codebooks 支持从一个 checkpoint 做 inference-time precision control。
+低精度 decode 也在变得更动态。[ReSET](https://arxiv.org/abs/2606.13233) 面向 latency-critical NVFP4 reasoning，用 step-aware temperature scaling 处理 quantization-induced sampling error。[Multi-Bitwidth Quantization](https://arxiv.org/abs/2606.12876) 用 additive codebooks 支持从一个 checkpoint 做 inference-time precision control。
 
 serving implication 是：未来 runtime 可能需要 per-step policies。precision、speculation window、safety probing 和 KV transfer format 都可能在单个 request 内变化。这比“打开 speculative decoding”或“跑 int4 kernel”更强。
 
@@ -54,7 +54,7 @@ serving implication 是：未来 runtime 可能需要 per-step policies。precis
 
 在 edge 和 client accelerators 上，[TileFuse](https://arxiv.org/abs/2606.11357) 针对 AMD XDNA2/Ryzen AI NPUs 做 fused unpack-dequant-GEMM kernels、weight layout、metadata placement 和 array-level dataflow。[PALUTE](https://arxiv.org/abs/2606.08891) 则用 in-DRAM lookup-table query 和 near-memory LUT generation 处理 edge LLM inference。
 
-data movement path 已经不只是 host-to-device 或 GPU-to-GPU。它包括 chiplet GPU 的 HBM-stack locality、Tensor Core 与 CUDA Core balance、packed-weight unpacking、quantization metadata placement，以及 DRAM-local lookup execution。因此 serving claim 需要 hardware-qualified evidence：同一个 checkpoint、kernel 或 compression format，在 datacenter GPU、PCIe GPU、client NPU 和 near-memory design 上可能有不同瓶颈。
+data movement path 已经不只是 host-to-device 或 GPU-to-GPU。它包括 chiplet GPU 的 HBM-stack locality、packed-weight unpacking、quantization metadata placement、NPU-local dataflow，以及 DRAM-local lookup execution。因此 serving claim 需要 hardware-qualified evidence：同一个 checkpoint、kernel 或 compression format，在 datacenter GPU、PCIe GPU、client NPU 和 near-memory design 上可能有不同瓶颈。
 
 ## Edge Serving 是 Bounded Semantic State
 
@@ -62,7 +62,7 @@ Edge serving 不是更小的 datacenter serving。[SemanticXR](https://arxiv.org
 
 架构重点是 edge state 往往是 persistent、environmental，并且部分与 cloud 共享。在 [SemanticXR](https://arxiv.org/abs/2606.12849) 中，移动单元是 object 而不是 frame。在 [LPSE](https://arxiv.org/abs/2606.08869) 中，runtime-facing object 是 compact predictive state，而不是 raw telemetry。
 
-这说明 edge AI serving 应该围绕 semantic deltas、local memory budgets 和 explicit cloud handoff 设计，而不只是 model invocation APIs。低精度和 near-memory 技术如 [TileFuse](https://arxiv.org/abs/2606.11357)、[PALUTE](https://arxiv.org/abs/2606.08891)、[APEX4](https://arxiv.org/abs/2606.08761) 和 [ReSET](https://arxiv.org/abs/2606.13233) 只有在系统也能决定哪些 state 必须因 latency、privacy 或 power 保留在本地时才有意义。
+这说明 edge AI serving 应该围绕 semantic deltas、local memory budgets 和 explicit cloud handoff 设计，而不只是 model invocation APIs。低精度和 near-memory 技术如 [TileFuse](https://arxiv.org/abs/2606.11357)、[PALUTE](https://arxiv.org/abs/2606.08891) 和 [ReSET](https://arxiv.org/abs/2606.13233) 只有在系统也能决定哪些 state 必须因 latency、privacy 或 power 保留在本地时才有意义。
 
 ## Agentic Serving 增加 Memory Provenance
 
@@ -72,6 +72,6 @@ Agentic serving 增加了另一类 state：跨 turn 读写的 persistent memory�
 
 ## Research Agenda
 
-近期最有用的 serving abstraction 是 typed state object。它应该携带 identity、position semantics、precision、compression format、residency、provenance、sharing scope 和 invalidation rules。这个需求在 [MiniPIC](https://arxiv.org/abs/2606.13126) 的 position-independent prefix reuse、[SpectrumKV](https://arxiv.org/abs/2606.08635) 的 mixed-precision KV movement、[ITME](https://arxiv.org/abs/2606.12556) 的 tiered context placement、[SemanticXR](https://arxiv.org/abs/2606.12849) 的 object-level edge state，以及 [The Containment Gap](https://arxiv.org/abs/2606.12797) 的 persistent agent memory 中都很清楚。
+近期最有用的 serving abstraction 是 typed state object。它应该携带 identity、position semantics、precision、compression format、residency、provenance、sharing scope 和 invalidation rules。这个需求在 [MiniPIC](https://arxiv.org/abs/2606.13126) 的 position-independent prefix reuse、[ITME](https://arxiv.org/abs/2606.12556) 的 tiered context placement、[SemanticXR](https://arxiv.org/abs/2606.12849) 的 object-level edge state，以及 [The Containment Gap](https://arxiv.org/abs/2606.12797) 的 persistent agent memory 中都很清楚。
 
 难点是系统能否暴露这些 state 而不把 runtime 变成慢 metadata engine。真正需要观察的是：减少 memory footprint、transfer volume 或 kernel time 的技术，是否能让 bookkeeping、reconstruction、validation 和 scheduling overhead 不进入 latency-critical path。
