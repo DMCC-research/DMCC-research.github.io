@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 数据移动成为 AI 系统控制平面
+title: "\u6570\u636E\u79FB\u52A8\u6210\u4E3A AI \u7CFB\u7EDF\u63A7\u5236\u5E73\u9762"
 date: '2026-06-14'
 research_domain: R2
 tags:
@@ -11,7 +11,7 @@ tags:
 - scheduling
 - near-data-computing
 source_period: weekly
-start_date: '2026-06-07'
+start_date: '2026-06-08'
 end_date: '2026-06-14'
 research_domain_slug: data-movement-centric-ai-infrastructure
 lang: zh
@@ -20,7 +20,7 @@ translation_key: weekly-2026-W24-r2
 
 这一周的 AI infrastructure 论文指向一个共同架构变化：data placement、movement 和 transformation 正在变成显式 control-plane concern，而不只是 model execution 的副作用。机制层面的问题不再只是“有多少 memory”，而是“哪个 state 应该 resident、compressed、transferred、approximated 或 recomputed，以及什么时候做”。
 
-最清晰的信号来自 KV 和 context state。[MiniPIC](https://arxiv.org/abs/2606.13126) 通过 unrotated K cache 和 logical positions 做 position-independent prefix-cache reuse。[SpectrumKV](https://arxiv.org/abs/2606.08635) 把 prefill-decode disaggregated serving 中的 KV transfer 建模成 per-token mixed-precision allocation。[STAR-KV](https://arxiv.org/abs/2606.08382) 用 adaptive low-rank control 压缩 KV cache；[Express Language Modeling](https://arxiv.org/abs/2606.10944) 从 causal-attention approximation、memory-bounded decoding 和 compression overhead 的角度处理 long-context inference。[Context-Driven Incremental Compression](https://arxiv.org/abs/2606.12411) 把同一主题扩展到 multi-turn dialogue：conversational memory 被 retrieve、revise 和 write back。
+最清晰的信号来自 KV 和 context state。[MiniPIC](https://arxiv.org/abs/2606.13126) 通过 unrotated K cache 和 logical positions 做 position-independent prefix-cache reuse。[Express Language Modeling](https://arxiv.org/abs/2606.10944) 从 causal-attention approximation、memory-bounded decoding 和 compression overhead 的角度处理 long-context inference。[Context-Driven Incremental Compression](https://arxiv.org/abs/2606.12411) 把同一主题扩展到 multi-turn dialogue：conversational memory 被 retrieve、revise 和 write back。
 
 data-movement implication 是：KV cache 正在变成 managed system object。它有 identity、position semantics、precision、lifetime、residency 和 transfer cost。我的判断是，这是下一代 serving systems 的正确抽象边界。把 KV 当成 opaque GPU scratch，会让 prefix reuse、prefill-decode separation、long-context compression 和 multi-turn memory policies 很难组合。
 
@@ -38,7 +38,7 @@ data-movement implication 是：KV cache 正在变成 managed system object。�
 
 ## Near-Data 与 Edge 强化同一议程
 
-Near-data 和 edge 工作也强化了这个方向。[SemanticXR](https://arxiv.org/abs/2606.12849) 提出 object-level device-cloud semantic mapping，让 sparse object state 而不是 dense raw mapping data 成为 communication unit。[PALUTE](https://arxiv.org/abs/2606.08891) 把 lookup-table inference behavior 移到 DRAM 内或附近。[TileFuse](https://arxiv.org/abs/2606.11357) 在 AMD NPUs 上融合 unpacking、dequantization 和 GEMM；[APEX4](https://arxiv.org/abs/2606.08761)、[ReSET](https://arxiv.org/abs/2606.13233) 和 [Drop-by-Drop](https://arxiv.org/abs/2606.12876) 都说明 low precision 改变的不只是 arithmetic，还包括 memory footprint、metadata movement、dequantization placement 和 kernel shape。
+Near-data 和 edge 工作也强化了这个方向。[SemanticXR](https://arxiv.org/abs/2606.12849) 提出 object-level device-cloud semantic mapping，让 sparse object state 而不是 dense raw mapping data 成为 communication unit。[PALUTE](https://arxiv.org/abs/2606.08891) 把 lookup-table inference behavior 移到 DRAM 内或附近。[TileFuse](https://arxiv.org/abs/2606.11357) 在 AMD NPUs 上融合 unpacking、dequantization 和 GEMM；[ReSET](https://arxiv.org/abs/2606.13233) 和 [Drop-by-Drop](https://arxiv.org/abs/2606.12876) 说明 low precision 改变的不只是 arithmetic，还包括 memory footprint、metadata movement、dequantization placement 和 kernel shape。
 
 实际设计问题不是 computation 是否发生在 edge、memory 或 cloud，而是哪种 representation 穿过每个边界：raw sensor data、objects、LUT indices、quantized weights、metadata、hidden state、KV cache，还是 final answers。
 
@@ -52,7 +52,7 @@ Near-data 和 edge 工作也强化了这个方向。[SemanticXR](https://arxiv.o
 
 第一，cache identity 应该与 prompt position 解耦。[MiniPIC](https://arxiv.org/abs/2606.13126) 是一个小机制，但方向更大：reuse 应该通过 compatibility 和 logical position 表达，而不只是 byte-identical prefix layout。
 
-第二，precision 应该被当作 movement policy。[SpectrumKV](https://arxiv.org/abs/2606.08635)、[STAR-KV](https://arxiv.org/abs/2606.08382)、[TileFuse](https://arxiv.org/abs/2606.11357)、[APEX4](https://arxiv.org/abs/2606.08761)、[ReSET](https://arxiv.org/abs/2606.13233) 和 [Drop-by-Drop](https://arxiv.org/abs/2606.12876) 都把 precision 变成 bandwidth、latency、metadata 和 quality 的 tradeoff。
+第二，precision 应该被当作 movement policy。[TileFuse](https://arxiv.org/abs/2606.11357)、[ReSET](https://arxiv.org/abs/2606.13233) 和 [Drop-by-Drop](https://arxiv.org/abs/2606.12876) 都把 precision 变成 bandwidth、latency、metadata 和 quality 的 tradeoff。
 
 第三，scheduling 应该预测 future state demand。[ForeMoE](https://arxiv.org/abs/2606.11867) 预测 expert demand，[GF-DiT](https://arxiv.org/abs/2606.13501) 调度 trajectory structure，[ITME](https://arxiv.org/abs/2606.12556) 依赖跨 tier proactive movement，[SemanticXR](https://arxiv.org/abs/2606.12849) 用 object-level structure 决定哪些 state 必须移动。
 

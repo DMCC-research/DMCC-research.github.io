@@ -1,6 +1,7 @@
 ---
 layout: post
-title: Personal AI Hardware 正在变成状态放置问题
+title: "Personal AI Hardware \u6B63\u5728\u53D8\u6210\u72B6\u6001\u653E\u7F6E\u95EE\
+  \u9898"
 date: '2026-06-14'
 research_domain: R3
 tags:
@@ -11,7 +12,7 @@ tags:
 - agent-memory
 - secure-hardware
 source_period: weekly
-start_date: '2026-06-07'
+start_date: '2026-06-08'
 end_date: '2026-06-14'
 research_domain_slug: personal-superintelligence-bci-hardware
 lang: zh
@@ -40,13 +41,13 @@ agent-memory 论文也强化了这一点。[MemRefine](https://arxiv.org/abs/260
 
 [MiniPIC](https://arxiv.org/abs/2606.13126) 通过 unrotated K cache、logical positions、cache-reuse primitives 和 block-level causal attention 做 position-independent caching。这让 KV cache 更像带 logical addressing 的 reusable state，而不是 opaque serving artifact。对 personal agent 来说，可复用 context fragments 可能代表 device state、preferences、recent tasks、identity constraints 或 private working memory。
 
-[STAR-KV](https://arxiv.org/abs/2606.08382) 用 adaptive low-rank rank control、head-block sensitivity 和 mixed-precision cache movement 压缩 KV cache。[End-to-End Context Compression at Scale](https://arxiv.org/abs/2606.09659) 用 latent context compression、encoder-decoder compression 和 adaptive context expansion。[FlashMemory-DeepSeek-V4](https://arxiv.org/abs/2606.09079) 用 lookahead sparse attention、query-critical KV residency 和 context-demand prediction 支持 ultra-long context。
+[End-to-End Context Compression at Scale](https://arxiv.org/abs/2606.09659) 用 latent context compression、encoder-decoder compression 和 adaptive context expansion。[FlashMemory-DeepSeek-V4](https://arxiv.org/abs/2606.09079) 用 lookahead sparse attention、query-critical KV residency 和 context-demand prediction 支持 ultra-long context。
 
 这些论文合起来说明，“context”正在变成一个 hierarchy：prompt tokens、KV blocks、compressed latent state、retrieval records 和 sparse resident memory。硬件问题是每一层应该住在哪里：NPU SRAM、device DRAM、local storage、secure enclave、phone/PC GPU memory，还是 cloud GPU memory。
 
 ## Edge AI Hardware 主要是 Layout Discipline
 
-edge-inference 论文纠正了过于简单的 TOPS 叙事。[TileFuse](https://arxiv.org/abs/2606.11357) 面向 AMD XDNA2/Ryzen AI NPUs，关注 fused unpack-dequant-GEMM kernels、weight layout、metadata placement 和 array-level dataflow。[APEX4](https://arxiv.org/abs/2606.08761) 通过围绕 dequantization bottleneck 平衡 Tensor Core 和 CUDA Core work 支持 pure W4A4 inference。[ReSET](https://arxiv.org/abs/2606.13233) 用 step-aware temperature scaling 处理 latency-critical NVFP4 reasoning 中的 sampling error。[TWLA](https://arxiv.org/abs/2606.13054) 结合 ternary weights、low-bit activations、activation outlier suppression 和 mixed-precision activation allocation。[Multi-Bitwidth Quantization](https://arxiv.org/abs/2606.12876) 用 additive codebooks 从一个 checkpoint 支持 inference-time precision control。
+edge-inference 论文纠正了过于简单的 TOPS 叙事。[TileFuse](https://arxiv.org/abs/2606.11357) 面向 AMD XDNA2/Ryzen AI NPUs，关注 fused unpack-dequant-GEMM kernels、weight layout、metadata placement 和 array-level dataflow。[ReSET](https://arxiv.org/abs/2606.13233) 用 step-aware temperature scaling 处理 latency-critical NVFP4 reasoning 中的 sampling error。[TWLA](https://arxiv.org/abs/2606.13054) 结合 ternary weights、low-bit activations、activation outlier suppression 和 mixed-precision activation allocation。[Multi-Bitwidth Quantization](https://arxiv.org/abs/2606.12876) 用 additive codebooks 从一个 checkpoint 支持 inference-time precision control。
 
 共同机制不只是 lower precision，而是在 compressed weights、metadata、scalar units、tensor units、SRAM、DRAM 和 sampling logic 之间管理 movement。[PALUTE](https://arxiv.org/abs/2606.08891) 更直接：它使用 processing-in-memory lookup tables、in-DRAM LUT queries、near-memory LUT generation 和 memory-tier scheduling 做 edge LLM inference。
 
@@ -72,6 +73,6 @@ personal AI 很可能是 hybrid：本地设备处理 private state 和 low-laten
 
 这一周最强的系统框架是：personal AI hardware 应该按 state lifecycle 评估。
 
-反复出现的 primitives 是 capture、compress、cache、retrieve、revise、validate 和 evict。[SemanticXR](https://arxiv.org/abs/2606.12849) 展示了 wearable side 的 object-level state；[MiniPIC](https://arxiv.org/abs/2606.13126)、[STAR-KV](https://arxiv.org/abs/2606.08382) 和 [End-to-End Context Compression](https://arxiv.org/abs/2606.09659) 展示了 inference-memory side；[TileFuse](https://arxiv.org/abs/2606.11357)、[PALUTE](https://arxiv.org/abs/2606.08891) 和 [APEX4](https://arxiv.org/abs/2606.08761) 展示了 edge-accelerator side；[The Containment Gap](https://arxiv.org/abs/2606.12797) 展示了 agent-security side。
+反复出现的 primitives 是 capture、compress、cache、retrieve、revise、validate 和 evict。[SemanticXR](https://arxiv.org/abs/2606.12849) 展示了 wearable side 的 object-level state；[MiniPIC](https://arxiv.org/abs/2606.13126) 和 [End-to-End Context Compression](https://arxiv.org/abs/2606.09659) 展示了 inference-memory side；[TileFuse](https://arxiv.org/abs/2606.11357) 和 [PALUTE](https://arxiv.org/abs/2606.08891) 展示了 edge-accelerator side；[The Containment Gap](https://arxiv.org/abs/2606.12797) 展示了 agent-security side。
 
 这就是 secure personal AI interfaces 的架构议程：edge 上的 sensors 和 future BCI streams，device 上的 semantic objects，靠近 inference 的 KV 和 latent memory，长期状态的 encrypted retrieval stores，以及只用于 bounded compute bursts 的 cloud execution。

@@ -11,7 +11,7 @@ tags:
 - scheduling
 - near-data-computing
 source_period: weekly
-start_date: '2026-06-07'
+start_date: '2026-06-08'
 end_date: '2026-06-14'
 research_domain_slug: data-movement-centric-ai-infrastructure
 lang: en
@@ -20,7 +20,7 @@ translation_key: weekly-2026-W24-r2
 
 This week’s AI infrastructure papers point toward a common architectural shift: data placement, movement, and transformation are becoming explicit control-plane concerns rather than secondary effects of model execution. The mechanism-level question is no longer just “how much memory is available?” It is “which state should be resident, compressed, transferred, approximated, or recomputed, and when?”
 
-The clearest signal is around KV and context state. [MiniPIC](https://arxiv.org/abs/2606.13126) treats prefix-cache reuse as a position-independent mechanism using an unrotated K cache and logical positions. [SpectrumKV](https://arxiv.org/abs/2606.08635) treats KV transfer in prefill-decode disaggregated serving as a per-token mixed-precision allocation problem. [STAR-KV](https://arxiv.org/abs/2606.08382) compresses KV cache with adaptive low-rank control, while [Express Language Modeling](https://arxiv.org/abs/2606.10944) frames long-context inference around causal-attention approximation, memory-bounded decoding, and compression overhead. [Context-Driven Incremental Compression](https://arxiv.org/abs/2606.12411) extends the same theme into multi-turn dialogue, where conversational memory is retrieved, revised, and written back.
+The clearest signal is around KV and context state. [MiniPIC](https://arxiv.org/abs/2606.13126) treats prefix-cache reuse as a position-independent mechanism using an unrotated K cache and logical positions. [Express Language Modeling](https://arxiv.org/abs/2606.10944) frames long-context inference around causal-attention approximation, memory-bounded decoding, and compression overhead. [Context-Driven Incremental Compression](https://arxiv.org/abs/2606.12411) extends the same theme into multi-turn dialogue, where conversational memory is retrieved, revised, and written back.
 
 The data-movement implication is that KV cache is becoming a managed system object. It has identity, position semantics, precision, lifetime, residency, and transfer cost. My judgment is that this is the right abstraction boundary for the next generation of serving systems: treating KV as opaque GPU scratch will make it hard to compose prefix reuse, prefill-decode separation, long-context compression, and multi-turn memory policies.
 
@@ -32,7 +32,7 @@ Scheduling papers also read differently through this lens. [GF-DiT](https://arxi
 
 This suggests a sharper evaluation question for schedulers: how many bytes move per useful unit of progress? GPU occupancy and tokens per second are incomplete if a policy simply relocates congestion from HBM to CXL, from NVLink to NICs, or from local all-reduce to wide-area synchronization.
 
-Near-data and edge work reinforces the same agenda. [SemanticXR](https://arxiv.org/abs/2606.12849) proposes object-level device-cloud semantic mapping, where sparse object state rather than dense raw mapping data becomes the communication unit. [PALUTE](https://arxiv.org/abs/2606.08891) moves lookup-table inference behavior into or near DRAM for edge LLM inference. [TileFuse](https://arxiv.org/abs/2606.11357) fuses unpacking, dequantization, and GEMM on AMD NPUs, while [APEX4](https://arxiv.org/abs/2606.08761), [ReSET](https://arxiv.org/abs/2606.13233), and [Drop-by-Drop](https://arxiv.org/abs/2606.12876) all show that low precision affects more than arithmetic: it changes memory footprint, metadata movement, dequantization placement, and kernel shape.
+Near-data and edge work reinforces the same agenda. [SemanticXR](https://arxiv.org/abs/2606.12849) proposes object-level device-cloud semantic mapping, where sparse object state rather than dense raw mapping data becomes the communication unit. [PALUTE](https://arxiv.org/abs/2606.08891) moves lookup-table inference behavior into or near DRAM for edge LLM inference. [TileFuse](https://arxiv.org/abs/2606.11357) fuses unpacking, dequantization, and GEMM on AMD NPUs, while [ReSET](https://arxiv.org/abs/2606.13233) and [Drop-by-Drop](https://arxiv.org/abs/2606.12876) show that low precision affects more than arithmetic: it changes memory footprint, metadata movement, dequantization placement, and kernel shape.
 
 The practical design question is not simply whether computation happens at the edge, in memory, or in the cloud. It is which representation crosses each boundary: raw sensor data, objects, LUT indices, quantized weights, metadata, hidden state, KV cache, or final answers.
 
@@ -44,7 +44,7 @@ Three design principles stand out from this week’s updates.
 
 First, cache identity should be decoupled from prompt position. [MiniPIC](https://arxiv.org/abs/2606.13126) is a small mechanism, but the architectural direction is larger: reuse should be expressed through compatibility and logical position, not only byte-identical prefix layout.
 
-Second, precision should be treated as a movement policy. [SpectrumKV](https://arxiv.org/abs/2606.08635), [STAR-KV](https://arxiv.org/abs/2606.08382), [TileFuse](https://arxiv.org/abs/2606.11357), [APEX4](https://arxiv.org/abs/2606.08761), [ReSET](https://arxiv.org/abs/2606.13233), and [Drop-by-Drop](https://arxiv.org/abs/2606.12876) all make precision a way to trade bandwidth, latency, metadata, and quality.
+Second, precision should be treated as a movement policy. [TileFuse](https://arxiv.org/abs/2606.11357), [ReSET](https://arxiv.org/abs/2606.13233), and [Drop-by-Drop](https://arxiv.org/abs/2606.12876) make precision a way to trade bandwidth, latency, metadata, and quality.
 
 Third, scheduling should predict future state demand. [ForeMoE](https://arxiv.org/abs/2606.11867) predicts expert demand, [GF-DiT](https://arxiv.org/abs/2606.13501) schedules trajectory structure, [ITME](https://arxiv.org/abs/2606.12556) relies on proactive movement across tiers, and [SemanticXR](https://arxiv.org/abs/2606.12849) uses object-level structure to decide what state must move.
 

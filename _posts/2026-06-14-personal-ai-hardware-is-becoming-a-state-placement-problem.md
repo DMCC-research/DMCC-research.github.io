@@ -11,7 +11,7 @@ tags:
 - agent-memory
 - secure-hardware
 source_period: weekly
-start_date: '2026-06-07'
+start_date: '2026-06-08'
 end_date: '2026-06-14'
 research_domain_slug: personal-superintelligence-bci-hardware
 lang: en
@@ -40,7 +40,7 @@ The KV-cache work this week is especially relevant for personal agents because i
 
 [MiniPIC](https://arxiv.org/abs/2606.13126) proposes position-independent caching through unrotated K cache, logical positions, cache-reuse primitives, and block-level causal attention. That makes KV cache look less like an opaque serving artifact and more like reusable state with logical addressing. For a personal agent, reusable context fragments could represent device state, preferences, recent tasks, identity constraints, or private working memory.
 
-[STAR-KV](https://arxiv.org/abs/2606.08382) compresses KV cache with adaptive low-rank rank control, head-block sensitivity, and mixed-precision cache movement. [End-to-End Context Compression at Scale](https://arxiv.org/abs/2606.09659) uses latent context compression with encoder-decoder compression and adaptive context expansion. [FlashMemory-DeepSeek-V4](https://arxiv.org/abs/2606.09079) proposes lookahead sparse attention with query-critical KV residency and context-demand prediction for ultra-long context.
+[End-to-End Context Compression at Scale](https://arxiv.org/abs/2606.09659) uses latent context compression with encoder-decoder compression and adaptive context expansion. [FlashMemory-DeepSeek-V4](https://arxiv.org/abs/2606.09079) proposes lookahead sparse attention with query-critical KV residency and context-demand prediction for ultra-long context.
 
 Taken together, these papers suggest that “context” is becoming a hierarchy: prompt tokens, KV blocks, compressed latent state, retrieval records, and sparse resident memory. The hardware question is where each tier should live: NPU SRAM, device DRAM, local storage, a secure enclave, phone or PC GPU memory, or cloud GPU memory.
 
@@ -48,7 +48,7 @@ Taken together, these papers suggest that “context” is becoming a hierarchy:
 
 The edge-inference papers are a useful corrective to simplistic TOPS-based hardware narratives.
 
-[TileFuse](https://arxiv.org/abs/2606.11357) focuses on fused unpack-dequant-GEMM kernels, weight layout, metadata placement, and array-level dataflow for quantized LLM inference on AMD XDNA2/Ryzen AI NPUs. [APEX4](https://arxiv.org/abs/2606.08761) targets pure W4A4 inference by rebalancing Tensor Core and CUDA Core work around dequantization bottlenecks. [ReSET](https://arxiv.org/abs/2606.13233) addresses latency-critical NVFP4 reasoning through step-aware temperature scaling for quantization-induced sampling error. [TWLA](https://arxiv.org/abs/2606.13054) combines ternary weights with low-bit activations using activation outlier suppression and mixed-precision activation allocation. [Multi-Bitwidth Quantization](https://arxiv.org/abs/2606.12876) uses additive codebooks to support inference-time precision control from one checkpoint.
+[TileFuse](https://arxiv.org/abs/2606.11357) focuses on fused unpack-dequant-GEMM kernels, weight layout, metadata placement, and array-level dataflow for quantized LLM inference on AMD XDNA2/Ryzen AI NPUs. [ReSET](https://arxiv.org/abs/2606.13233) addresses latency-critical NVFP4 reasoning through step-aware temperature scaling for quantization-induced sampling error. [TWLA](https://arxiv.org/abs/2606.13054) combines ternary weights with low-bit activations using activation outlier suppression and mixed-precision activation allocation. [Multi-Bitwidth Quantization](https://arxiv.org/abs/2606.12876) uses additive codebooks to support inference-time precision control from one checkpoint.
 
 The common mechanism is not just lower precision. It is managing movement among compressed weights, metadata, scalar units, tensor units, SRAM, DRAM, and sampling logic. [PALUTE](https://arxiv.org/abs/2606.08891) makes that explicit by using processing-in-memory lookup tables, in-DRAM LUT queries, near-memory LUT generation, and memory-tier scheduling for edge LLM inference.
 
@@ -74,6 +74,6 @@ For personal AI, the analogous problem is not just where to minimize token cost.
 
 The strongest systems frame this week is: personal AI hardware should be evaluated by state lifecycle.
 
-The recurring primitives are capture, compress, cache, retrieve, revise, validate, and evict. [SemanticXR](https://arxiv.org/abs/2606.12849) shows the wearable side of this pattern through object-level state. [MiniPIC](https://arxiv.org/abs/2606.13126), [STAR-KV](https://arxiv.org/abs/2606.08382), and [End-to-End Context Compression](https://arxiv.org/abs/2606.09659) show the inference-memory side. [TileFuse](https://arxiv.org/abs/2606.11357), [PALUTE](https://arxiv.org/abs/2606.08891), and [APEX4](https://arxiv.org/abs/2606.08761) show the edge-accelerator side. [The Containment Gap](https://arxiv.org/abs/2606.12797) shows the agent-security side.
+The recurring primitives are capture, compress, cache, retrieve, revise, validate, and evict. [SemanticXR](https://arxiv.org/abs/2606.12849) shows the wearable side of this pattern through object-level state. [MiniPIC](https://arxiv.org/abs/2606.13126) and [End-to-End Context Compression](https://arxiv.org/abs/2606.09659) show the inference-memory side. [TileFuse](https://arxiv.org/abs/2606.11357) and [PALUTE](https://arxiv.org/abs/2606.08891) show the edge-accelerator side. [The Containment Gap](https://arxiv.org/abs/2606.12797) shows the agent-security side.
 
 That is the architecture agenda for secure personal AI interfaces: sensors and future BCI streams at the edge, semantic objects on device, KV and latent memory near inference, encrypted retrieval stores for long-term state, and cloud execution only for bounded compute bursts.
