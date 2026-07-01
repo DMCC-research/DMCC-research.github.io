@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 'Personal Superintelligence and BCI Hardware: Weekly Synthesis'
+title: 'Personal AI Hardware: Semantic Objects, Scoped KV, and Memory Integrity'
 date: '2026-06-14'
 research_domain: R3
 research_domain_slug: personal-superintelligence-bci-hardware
